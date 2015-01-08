@@ -69,8 +69,8 @@
        (vhost-directory document-root-path)
        \newline
        (vhost-rewrite-rules 
-        [(str "RewriteRule ^/$ http://" domain-name ":" port "/ [P]")
-         (str "RewriteRule ^/(.+)$ http://" domain-name ":" port "/$1 [P]")])
+        [(str "RewriteRule ^/$ http://localhost:" port "/ [P]")
+         (str "RewriteRule ^/(.+)$ http://localhost:" port "/$1 [P]")])
        \newline
        "</VirtualHost>" \newline))
 

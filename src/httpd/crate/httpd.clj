@@ -20,16 +20,27 @@
   (let [settings (get-settings :httpd {:instance-id instance-id})]
     (package "apache2")))
 
+(defn apache2ctl
+  "Start, stop, restart with apache2ctl command"
+  [cmd]
+  (pallet.actions/exec nil (str "sudo apache2ctl " cmd)))
+
+(defn a2enmod
+  "Enable apache modules such as mod_rewrite, mode_proxy, etc"
+  [mod]
+  (pallet.actions/exec nil (str "a2enmod " mod)))
+
 (defn server-spec
   "Options: (none yet)"
   [settings & {:keys [instance-id] :as options}]
   (api/server-spec
    :phases {:settings (plan-fn (httpd.crate.httpd/settings 
                                 (merge settings options)))
-            :configure (plan-fn (install options))}
+            :bootstrap (plan-fn (install options))
+            :restart (plan-fn (apache2ctl "restart"))}
    :default-phases [:install]))
 
-(defn- a2ensite
+(defn a2ensite
   "Enable vhost site. vhost-conf should be the name of a conf file in
   sites-available"
   [vhost-conf]
@@ -49,12 +60,7 @@
                                 :mode "644"
                                 :content content)
     ;; enable site
-    (a2ensite (str alias ".conf"))))
-
-(defn apache2ctl
-  "Start, stop, restart with apache2ctl command"
-  [cmd]
-  (pallet.actions/exec nil (str "sudo apache2ctl " cmd)))
+    (a2ensite (str domain-name ".conf"))))
 
 (defn deploy-site
   [remote-dir-path]
@@ -70,5 +76,3 @@
                                 :group "root"
                                 :mode "644"
                                 :content content)))
-
-
