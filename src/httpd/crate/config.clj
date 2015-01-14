@@ -1,4 +1,4 @@
-(ns httpd.crate.httpd.config)
+(ns httpd.crate.config)
 
 ;; Convenience functions for creating apche configuration files.
 ;; So far, there's only functions for generating vhost configs, but

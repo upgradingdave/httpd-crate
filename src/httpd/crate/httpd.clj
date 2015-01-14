@@ -3,7 +3,7 @@
             [pallet.api :as api :refer [plan-fn]]
             [pallet.crate :refer [assoc-settings defplan
                                   get-settings]]
-            [httpd.crate.httpd.config :as config]))
+            [httpd.crate.config :as config]))
 
 (def ^{:dynamic true} *default-settings*
   {})
@@ -58,7 +58,9 @@
                                 :owner "root"
                                 :group "root"
                                 :mode "644"
-                                :content content)
+                                :content content
+                                :literal true
+                                )
     ;; enable site
     (a2ensite (str domain-name ".conf"))))
 
