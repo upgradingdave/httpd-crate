@@ -7,7 +7,7 @@
 
 (deftest vhost-conf
   (testing 
-    "original conf remains unchanged"
+    "original conf remains as unchanged as possible"
     (is 
       (= ["<VirtualHost *:80>"
           "ServerName owncloud.politaktiv.org"
@@ -46,15 +46,35 @@
     )
   
   (testing 
+    "a simple https config"
+    (is 
+      (= ["<VirtualHost *:443>"
+          "ServerName jira.intra.politaktiv.org"
+          "ServerAdmin webmaster@politaktiv.org"
+          ""
+          "GnuTLSEnable on"
+          "GnuTLSCacheTimeout 300"
+          "GnuTLSPriorities SECURE:!VERS-SSL3.0:!MD5:!DHE-RSA:!DHE-DSS:!AES-256-CBC:%COMPAT"
+          "GnuTLSExportCertificates on"
+          ""
+          "GnuTLSCertificateFile /etc/apache2/ssl.crt/jira.intra.politaktiv.org.crts"
+          "GnuTLSKeyFile /etc/apache2/ssl.key/jira.intra.politaktiv.org.key"
+          ""
+          "</VirtualHost>"
+          ]
+         (sut/vhost-conf-ssl-default 
+           :domain-name  "jira.intra.politaktiv.org" 
+           :server-admin-email "webmaster@politaktiv.org"
+           :ssl-module :gnutls)         
+         ))
+    )
+  
+  (testing 
     "http -> https"
     (is 
       (= ["<VirtualHost *:80>"
           "ServerName owncloud.politaktiv.org"
           "ServerAdmin admin@politaktiv.org"
-          ""          
-          "ErrorLog \"/var/log/apache2/error\"" 
-          "LogLevel warn" 
-          "CustomLog \"/var/log/apache2/access_log\" common"
           ""
           "RewriteEngine on"
           "RewriteCond %{HTTPS} !on"
@@ -62,11 +82,8 @@
           ""
           "</VirtualHost>"] 
          (sut/vhost-conf-default-redirect-to-https-only
-           "owncloud.politaktiv.org" 
-           "admin@politaktiv.org" 
-           nil 
-           nil 
-           80 )
+           :domain-name "owncloud.politaktiv.org" 
+           :server-admin-email "admin@politaktiv.org")
          ))    
     )
   )

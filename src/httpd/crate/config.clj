@@ -33,6 +33,14 @@
 
 (def vhost-tail ["</VirtualHost>"])
 
+(defn vhost-document-root
+  [& [document-root-path]]
+  (if document-root-path
+    [(str "DocumentRoot \"" document-root-path "\"")
+     ""]
+    [])  
+  )
+
 (defn vhost-directory
   [& [filepath]]
   (if filepath
@@ -88,23 +96,66 @@
     )
   )
 
+(defn vhost-gnutls 
+  [domain-name]
+  ["GnuTLSEnable on"
+   "GnuTLSCacheTimeout 300"
+   "GnuTLSPriorities SECURE:!VERS-SSL3.0:!MD5:!DHE-RSA:!DHE-DSS:!AES-256-CBC:%COMPAT"
+   "GnuTLSExportCertificates on"
+   ""
+   (str "GnuTLSCertificateFile /etc/apache2/ssl.crt/" domain-name ".crts")
+   (str "GnuTLSKeyFile /etc/apache2/ssl.key/" domain-name ".key")
+   ""]
+  )
+
 (defn vhost-conf-default-redirect-to-https-only
   "Just redirect http request permanently to https"
-  [domain-name server-admin-email document-root-path aliases port]
+  [& {:keys [domain-name 
+             aliases 
+             server-admin-email 
+             document-root-path 
+             port]
+      :or {server-admin-email "your-name@your-domain.com"
+           port "80"}}]
   (into 
     []
     (concat
-      (vhost-head :domain-name domain-name 
+      (vhost-head :listening-port port 
+                  :domain-name domain-name 
                   :server-admin-email server-admin-email
                   :aliases aliases)
-      (if document-root-path
-        [(str "DocumentRoot \"" document-root-path "\"")]
-        [])    
-      (vhost-log nil)
+      (vhost-document-root document-root-path)
       (vhost-rewrite-rules 
         ["RewriteCond %{HTTPS} !on"
          "RewriteRule ^/(.*)$ https://%{SERVER_NAME}/$1 [R=301,L]"]
         :use-proxy false)
+      vhost-tail
+      )
+    )
+  )
+
+(defn vhost-conf-ssl-default
+  "a https default configuration"
+  [& {:keys [domain-name 
+             aliases 
+             server-admin-email 
+             document-root-path 
+             port
+             ssl-module]
+      :or {server-admin-email "your-name@your-domain.com"
+           port "443"
+           ssl-module :gnutls}}]
+  (into 
+    []
+    (concat
+      (vhost-head :listening-port port
+                  :domain-name domain-name 
+                  :server-admin-email server-admin-email
+                  :aliases aliases)
+      (vhost-document-root document-root-path)
+      (if (= ssl-module :gnutls)
+        (vhost-gnutls domain-name)
+        )        
       vhost-tail
       )
     )
@@ -119,10 +170,7 @@
       (vhost-head :domain-name domain-name 
                   :server-admin-email server-admin-email
                   :aliases aliases)
-      (if document-root-path
-        [(str "DocumentRoot \"" document-root-path "\"")
-         ""]
-        [])    
+      (vhost-document-root document-root-path)  
       (vhost-log domain-name)
       (vhost-location "/")
       (vhost-directory document-root-path)
