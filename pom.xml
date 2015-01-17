@@ -7,11 +7,11 @@
   <name>httpd</name>
   <description>Pallet crate to install and run Apache httpd</description>
   <scm>
-    <connection>scm:git:git://github.com/upgradingdave/httpd-crate.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/upgradingdave/httpd-crate.git</developerConnection>
-    <tag>97a778b4127516d694b4b6c28cffe51a786244d6
+    <connection>scm:git:git://github.com/DomainDrivenArchitecture/httpd-crate.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/DomainDrivenArchitecture/httpd-crate.git</developerConnection>
+    <tag>3feb59d221f96937d9c1d7c2beba0d58aa74fb10
 </tag>
-    <url>https://github.com/upgradingdave/httpd-crate</url>
+    <url>https://github.com/DomainDrivenArchitecture/httpd-crate</url>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>
