@@ -42,13 +42,18 @@
   )
 
 (defn vhost-directory
-  [& [filepath]]
-  (if filepath
-    [(str "<Directory \"" filepath "\">")
-      "  Order allow,deny"
-      "  Allow from all"
-      "</Directory>"
-      ""]
+  [file-path & {:keys [directory-options]
+                :or {directory-options
+                     ["  Order allow,deny"
+                      "  Allow from all"]}}]
+  (if file-path
+    (into []
+          (concat
+            [(str "<Directory \"" file-path "\">")]
+            directory-options
+            ["</Directory>"
+             ""]
+            ))          
     []
     )
   )

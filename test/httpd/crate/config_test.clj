@@ -87,4 +87,30 @@
          ))    
     )
   )
+
+(deftest vhost-directory
+  (testing 
+    "with additional options"
+    (is 
+      (= ["<Directory \"/var/www/owncloud/\">"
+          "  Options Indexes FollowSymLinks MultiViews"
+          "  AllowOverride All"
+          "  SetEnv MOD_X_SENDFILE_ENABLED 1"
+          "  XSendFile On"
+          "  Order allow,deny"
+          "  allow from all"
+          "</Directory>"
+          ""]
+         (sut/vhost-directory 
+           "/var/www/owncloud/" 
+           :directory-options 
+           ["  Options Indexes FollowSymLinks MultiViews"
+            "  AllowOverride All"
+            "  SetEnv MOD_X_SENDFILE_ENABLED 1"
+            "  XSendFile On"
+            "  Order allow,deny"
+            "  allow from all"])
+         ))
+    )
+  )
   

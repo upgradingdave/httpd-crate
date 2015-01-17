@@ -51,5 +51,5 @@
              ;; vhost during the config phase. This is set up in the
              ;; httpd-server fn above, so we add that here as well.
              httpd-server
-]
+             ]
    :node-spec default-node-spec))
