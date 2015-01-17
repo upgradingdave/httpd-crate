@@ -113,4 +113,23 @@
          ))
     )
   )
+
+(deftest vhost-location
+  (testing 
+    "with additional options acording to newer apache config"
+    (is 
+      (= ["<Location />"
+          "  Satisfy Any"
+          "  Order deny,allow"
+          "  Allow from all"
+          "</Location>"
+          ""]
+         (sut/vhost-location  
+           :location-options 
+           ["  Satisfy Any"
+            "  Order deny,allow"
+            "  Allow from all"])
+         ))
+    )
+  )
   

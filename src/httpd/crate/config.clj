@@ -46,26 +46,30 @@
                 :or {directory-options
                      ["  Order allow,deny"
                       "  Allow from all"]}}]
-  (if file-path
-    (into []
-          (concat
-            [(str "<Directory \"" file-path "\">")]
-            directory-options
-            ["</Directory>"
-             ""]
-            ))          
-    []
-    )
+  (into []
+        (concat
+          [(str "<Directory \"" file-path "\">")]
+          directory-options
+          ["</Directory>"
+           ""]
+          ))
   )
 
 (defn vhost-location
   "If path is nil, defaults to \"/\" "
-  [& [path]]
-  [(str "<Location " (or path "/") ">")
-    "  Order allow,deny"
-    "  Allow from all"
-    "</Location>"
-    ""])
+  [& {:keys [path
+             location-options]
+      :or {path "/"
+           location-options
+           ["  Order allow,deny"
+            "  Allow from all"]}}]
+   (into []
+        (concat
+          [(str "<Location " path ">")]
+          location-options
+          ["</Location>"
+          ""]))
+   )
 
 (defn vhost-log 
   [domain-name]
