@@ -1,6 +1,7 @@
 (ns httpd.crate.config
   (require 
-  [clojure.string :as string]))
+  [clojure.string :as string]
+  [httpd.crate.config-gnutls :as gnutls]))
 
 ;; Convenience functions for creating apche configuration files.
 ;; So far, there's only functions for generating vhost configs, but
@@ -163,7 +164,7 @@
                   :aliases aliases)
       (vhost-document-root document-root-path)
       (if (= ssl-module :gnutls)
-        (vhost-gnutls domain-name)
+        (gnutls/vhost-gnutls domain-name)
         )        
       vhost-tail
       )

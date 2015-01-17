@@ -1,0 +1,11 @@
+
+# Format is: [remote host] [remote logname] [remote user] [request time] "[first request line]" [status] 
+# [respionse size in bytes] "[referer]" "[user agent]" [processtime in microseconds]
+LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" %D" combinedx
+
+# Possible values include: debug, info, notice, warn, error, crit,
+# alert, emerg.
+LogLevel warn
+
+ErrorLog /var/log/apache2/error.log
+CustomLog /var/log/apache2/access.log combinedx

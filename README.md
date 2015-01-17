@@ -28,7 +28,6 @@ to a backend java servlet.
 
 ## TODO's
 * config phase @vhost: 
-  * install (gnutls) certs
   * support for base auth
   
    <Location />
@@ -49,8 +48,6 @@ to a backend java servlet.
  * conf phase @ server:
   * hardening
    * ports, limit, logging, security
-  * gnutls
-  	* mods/gnutls
   * mod-jk
    * mods/jk
    * etc/libapache2-mod-jk/workers.properties

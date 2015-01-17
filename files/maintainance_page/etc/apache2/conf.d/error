@@ -1,0 +1,2 @@
+
+ErrorDocument 503 /var/www/static/error/503.html
