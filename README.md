@@ -13,13 +13,7 @@ that probably won't be for a while.
  * creation of complex vhost files
  * secure https (gnutls) config - proven at https://www.ssllabs.com/ssltest/
  * production grade hardening
- * maintainance page in case of appserver frontend
- * googles web-id
- * mod-jk configuration
- * basic auth
- * taller monitoring configs
- * config of max-clients (including maxfiles) 
-
+ 
 ## Usage
 
 Take a look at the code inside src/httpd/groups/httpd.clj for example
@@ -27,6 +21,15 @@ of how I use this crate to install apache and set up a reverse proxy
 to a backend java servlet.
 
 ## TODO's
+
+ * maintainance page in case of appserver frontend
+ * googles web-id
+ * mod-jk configuration
+ * basic auth
+ * taller monitoring configs
+ * config of max-clients (including maxfiles) 
+
+
 * config phase @vhost: 
   * support for base auth
   

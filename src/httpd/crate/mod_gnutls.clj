@@ -15,13 +15,19 @@
 
 (defn- certs-file-name
   [domain-name]
-  (str "/etc/apache2/ssl.key/" domain-name ".certs")
+  (str "/etc/apache2/ssl.crt/" domain-name ".certs")
   )
 
 (defn- key-file-name
   [domain-name]
   (str "/etc/apache2/ssl.key/" domain-name ".key")
   )
+
+(def gnutls-conf
+  ["<IfModule mod_gnutls.c>"
+   "  # managed by pallet - do not change manually"
+   "  GnuTLSCache dbm /var/cache/apache2/gnutls_cache"
+   "</IfModule>"])
 
 (defn gnutls-certs
   [ & {:keys [domain-cert
@@ -55,11 +61,13 @@
     :owner "root"
     :group "root"
     :mode "600"
-    :content 
-    (gnutls-certs 
-      :domain-cert domain-cert
-      :intermediate-certs intermediate-certs
-      :ca-cert ca-cert))
+    :content
+    (string/join
+      \newline 
+      (gnutls-certs 
+        :domain-cert domain-cert
+        :intermediate-certs intermediate-certs
+        :ca-cert ca-cert)))
   (actions/remote-file
     (key-file-name domain-name)
     :owner "root"
@@ -107,6 +115,9 @@
     :group "root"
     :mode "644"
     :force true
-    :content (slurp "/gnutls/etc/apache2/mods-available/gnutls.conf")
-    )
+    :content 
+    (string/join
+      \newline
+      gnutls-conf
+      ))
   )

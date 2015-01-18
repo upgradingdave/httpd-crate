@@ -1,7 +1,7 @@
 (ns httpd.crate.config
   (require 
   [clojure.string :as string]
-  [httpd.crate.config-gnutls :as gnutls]))
+  [httpd.crate.mod-gnutls :as gnutls]))
 
 ;; Convenience functions for creating apche configuration files.
 ;; So far, there's only functions for generating vhost configs, but
@@ -73,13 +73,19 @@
    )
 
 (defn vhost-log 
-  [domain-name]
+  [& {:keys [domain-name
+             error-name
+             log-name
+             log-format]
+      :or {error-name "error"
+           log-name "access_log"
+           log-format "common"}}]
   (let [log-prefix (if domain-name
                      (str domain-name "-")
                      "")]
-    [(str "ErrorLog \"/var/log/apache2/" log-prefix "error\"")
+    [(str "ErrorLog \"/var/log/apache2/" log-prefix error-name "\"")
       "LogLevel warn"
-      (str "CustomLog \"/var/log/apache2/" log-prefix "access_log\" common")
+      (str "CustomLog \"/var/log/apache2/" log-prefix log-name "\" " log-format)
       ""]
     )
    )
@@ -135,6 +141,9 @@
                   :server-admin-email server-admin-email
                   :aliases aliases)
       (vhost-document-root document-root-path)
+      (vhost-log :error-name "error.log"
+                 :log-name "access.log"
+                 :log-format "combined")
       (vhost-rewrite-rules 
         ["RewriteCond %{HTTPS} !on"
          "RewriteRule ^/(.*)$ https://%{SERVER_NAME}/$1 [R=301,L]"]
@@ -163,6 +172,9 @@
                   :server-admin-email server-admin-email
                   :aliases aliases)
       (vhost-document-root document-root-path)
+      (vhost-log :error-name "error.log"
+                 :log-name "ssl-access.log"
+                 :log-format "combined")
       (if (= ssl-module :gnutls)
         (gnutls/vhost-gnutls domain-name)
         )        
@@ -181,7 +193,7 @@
                   :server-admin-email server-admin-email
                   :aliases aliases)
       (vhost-document-root document-root-path)  
-      (vhost-log domain-name)
+      (vhost-log :domain-name domain-name)
       (vhost-location "/")
       (vhost-directory document-root-path)
       (vhost-rewrite-rules 
