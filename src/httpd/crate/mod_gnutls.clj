@@ -53,9 +53,9 @@
               ca-cert]
        :or {intermediate-certs []
             ca-cert ""}}]
-  (assert domain-name)
-  (assert domain-cert)
-  (assert domain-key)
+  {:pre [(not (nil? domain-name))
+         (not (nil? domain-cert))
+         (not (nil? domain-key))]}
   (actions/remote-file
     (certs-file-name domain-name)
     :owner "root"

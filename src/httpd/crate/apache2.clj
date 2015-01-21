@@ -19,7 +19,7 @@
 (def loadtest-logging
   ["# Format is: [remote host] [remote logname] [remote user] [request time] \"[first request line]\" [status]" 
    "# [respionse size in bytes] \"[referer]\" \"[user agent]\" [processtime in microseconds]"
-   "LogFormat \"%h %l %u %t \"%r\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-agent}i\\\" %D\" loadtest"
+   "LogFormat \"%h %l %u %t \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-agent}i\\\" %D\" loadtest"
   ""])
 
 (defn security
@@ -31,9 +31,10 @@
    "  Require all granted"
    "</Directory>"
    ""
-   (str "<LimitExcept " allowed-methods ">")
-   "</LimitExcept>"
-   ""                                                                                                                                                                                                                                            
+   ;;TODO - tut nicht
+   ;(str "<LimitExcept " allowed-methods ">")
+   ;"</LimitExcept>"
+   ;""                                                                                                                                                                                                                                            
    "ServerTokens Prod"                                                                                                                                                                                                    
    "ServerSignature On"                                                                                                                                                                                                   
    "TraceEnable Off"
@@ -42,8 +43,7 @@
 ])
 
 (def ports
-  ["NameVirtualHost *:80"
-   "Listen 80"
+  ["Listen 80"
    ""
    "<IfModule mod_ssl.c>"
    "  Listen 443"
@@ -92,6 +92,11 @@
                              "/etc/apache2/conf-enabled/security.conf"
                              security)  
   (configure-file "/etc/apache2/ports.conf" ports)
+  (pallet.actions/exec
+      {:language :bash}
+      (stevedore/script
+        ("a2enmod headers")
+      ))
   )
 
 (defn config-and-enable-vhost
