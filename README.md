@@ -12,24 +12,52 @@ that probably won't be for a while.
 ## Features
  * creation of complex vhost files
  * secure https (gnutls) config - proven at https://www.ssllabs.com/ssltest/
- * production grade hardening
+ * production grade apache hardening
  
-## Usage
+## Usage Examples
 
-Take a look at the code inside src/httpd/groups/httpd.clj for example
-of how I use this crate to install apache and set up a reverse proxy
-to a backend java servlet.
+(defn install-webserver
+  []
+  (apache2/install-apache2)
+  (gnutls/install-mod-gnutls)
+  )
+
+(defn configure-webserver
+  [& {:keys [domain-name 
+             domain-cert 
+             domain-key 
+             ca-cert]}]
+  (apache2/config-apache2-production-grade
+    :security 
+    (apache2/security))
+  (gnutls/configure-gnutls-credentials
+    :domain-name domain-name
+    :domain-cert domain-cert
+    :domain-key domain-key
+    :ca-cert ca-cert)
+  (apache2/config-and-enable-vhost
+    "default-000"
+    (vhost/vhost-conf-default-redirect-to-https-only
+      :domain-name domain-name  
+      :server-admin-email (str "admin@" domain-name)))
+  (apache2/config-and-enable-vhost
+    "default-ssl-000"
+    (some-own-vhost-definition
+      :domain-name domain-name  
+      :server-admin-email (str "admin@" domain-name)))
+  )
 
 ## TODO's
 
+ * config of max-clients
  * maintainance page in case of appserver frontend
  * googles web-id
  * mod-jk configuration
  * basic auth
  * taller monitoring configs
- * config of max-clients (including maxfiles) 
+  
 
-
+### some config snippets to be realized on demand
 * config phase @vhost: 
   * support for base auth
   
@@ -49,8 +77,6 @@ to a backend java servlet.
    Alias /<%= google_token %>.html "/var/www/static/google/<%= google_token %>.html"
 
  * conf phase @ server:
-  * hardening
-   * ports, limit, logging, security
   * mod-jk
    * mods/jk
    * etc/libapache2-mod-jk/workers.properties
@@ -59,8 +85,7 @@ to a backend java servlet.
    * /var/www/static
   * monitoring / load-testing
    * sysstat
-   
- * config of max-clients (including maxfiles)
+  * config of max-clients (including maxfiles)
   
 
 ## License
