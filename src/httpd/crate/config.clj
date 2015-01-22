@@ -194,7 +194,7 @@
                   :aliases aliases)
       (vhost-document-root document-root-path)  
       (vhost-log :domain-name domain-name)
-      (vhost-location "/")
+      (vhost-location :path "/")
       (vhost-directory document-root-path)
       (vhost-rewrite-rules 
         [(str "RewriteRule ^/$ http://localhost:" port "/ [P]")

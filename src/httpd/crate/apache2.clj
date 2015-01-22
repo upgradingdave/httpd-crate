@@ -22,19 +22,13 @@
    "LogFormat \"%h %l %u %t \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-agent}i\\\" %D\" loadtest"
   ""])
 
-(defn security
-  [ & {:keys [allowed-methods ]
-       :or {allowed-methods "GET POST OPTIONS"}}]
+(def security
   ["<Directory />"
    "  Options FollowSymLinks"
    "  AllowOverride FileInfo"
    "  Require all granted"
    "</Directory>"
-   ""
-   ;;TODO - tut nicht
-   ;(str "<LimitExcept " allowed-methods ">")
-   ;"</LimitExcept>"
-   ;""                                                                                                                                                                                                                                            
+   ""                                                                                                                                                                                                                          
    "ServerTokens Prod"                                                                                                                                                                                                    
    "ServerSignature On"                                                                                                                                                                                                   
    "TraceEnable Off"
@@ -83,7 +77,7 @@
               security 
               ports]
        :or {limits limits
-            security (security)
+            security security
             ports ports}}]
   (configure-file-and-enable "/etc/apache2/conf-available/limits.conf"
                              "/etc/apache2/conf-enabled/limits.conf"
