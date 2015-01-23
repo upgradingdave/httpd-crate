@@ -61,6 +61,7 @@
     :owner "root"
     :group "root"
     :mode "600"
+    :force true
     :content
     (string/join
       \newline 
@@ -73,6 +74,7 @@
     :owner "root"
     :group "root"
     :mode "600"
+    :force true
     :content domain-key)
   )
 
