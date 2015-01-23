@@ -9,6 +9,13 @@ configuration tasks like enable mods, and set up a virtual host.
 I'll update to work with more servers and config options as needed but
 that probably won't be for a while. 
 
+## compatability
+
+This crate is working with:
+ * pallet0.8
+ * ubuntu 14.04
+ * apache httpd 2.
+
 ## Features
  * creation of complex vhost files
  * secure https (gnutls) config - proven at https://www.ssllabs.com/ssltest/
@@ -36,12 +43,12 @@ that probably won't be for a while.
     :domain-key domain-key
     :ca-cert ca-cert)
   (apache2/config-and-enable-vhost
-    "default-000"
+    "000-default"
     (vhost/vhost-conf-default-redirect-to-https-only
       :domain-name domain-name  
       :server-admin-email (str "admin@" domain-name)))
   (apache2/config-and-enable-vhost
-    "default-ssl-000"
+    "000-default-ssl"
     (some-own-vhost-definition
       :domain-name domain-name  
       :server-admin-email (str "admin@" domain-name)))
