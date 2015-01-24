@@ -3,13 +3,13 @@
   <groupId>upgradingdave</groupId>
   <artifactId>httpd</artifactId>
   <packaging>jar</packaging>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
   <name>httpd</name>
   <description>Pallet crate to install and run Apache httpd</description>
   <scm>
     <connection>scm:git:git://github.com/DomainDrivenArchitecture/httpd-crate.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/DomainDrivenArchitecture/httpd-crate.git</developerConnection>
-    <tag>13c4e0a64e4a994d2a2567239cc6cfb7e2bca0b4
+    <tag>dae59865ad1f23d4baa34e17f0eb1d928b4ea009
 </tag>
     <url>https://github.com/DomainDrivenArchitecture/httpd-crate</url>
   </scm>
@@ -75,37 +75,6 @@
       <groupId>com.palletops</groupId>
       <artifactId>pallet</artifactId>
       <version>0.8.0-RC.9</version>
-    </dependency>
-    <dependency>
-      <groupId>com.palletops</groupId>
-      <artifactId>pallet-jclouds</artifactId>
-      <version>1.7.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jclouds</groupId>
-      <artifactId>jclouds-allblobstore</artifactId>
-      <version>1.7.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jclouds</groupId>
-      <artifactId>jclouds-allcompute</artifactId>
-      <version>1.7.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jclouds.driver</groupId>
-      <artifactId>jclouds-slf4j</artifactId>
-      <version>1.7.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jclouds.driver</groupId>
-      <artifactId>jclouds-sshj</artifactId>
-      <version>1.7.2</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>

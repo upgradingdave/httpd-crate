@@ -23,13 +23,16 @@
              server-admin-email
              aliases]
       :or {listening-port "80"}}]
-  (concat
-    [(str "<VirtualHost *:" listening-port ">")
-     (str "ServerName " domain-name)]
-    (vhost-server-alias aliases)
-    [(str "ServerAdmin " server-admin-email)
-     ""]
-    )
+  (let [server-admin-email (if server-admin-email
+                             server-admin-email
+                             (str "admin@" domain-name))]
+    (concat
+      [(str "<VirtualHost *:" listening-port ">")
+       (str "ServerName " domain-name)]
+      (vhost-server-alias aliases)
+      [(str "ServerAdmin " server-admin-email)
+       ""]
+      ))
   )
 
 (def vhost-tail ["</VirtualHost>"])

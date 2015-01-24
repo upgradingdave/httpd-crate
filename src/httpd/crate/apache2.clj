@@ -56,6 +56,7 @@
     :group "root"
     :mode "644"
     :force true
+    :literal true
     :content 
     (string/join
       \newline
