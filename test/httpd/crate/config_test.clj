@@ -13,6 +13,21 @@
     [httpd.crate.config :as sut]
     ))
 
+(deftest vhost-head
+  (testing
+    "default admins emailadress"
+    (is 
+      (= ["<VirtualHost *:80>"
+          "ServerName owncloud.politaktiv.org"
+          "ServerAdmin admin@owncloud.politaktiv.org"
+          ""]
+         (sut/vhost-head
+           :domain-name "owncloud.politaktiv.org"
+           )
+         )
+      ))
+  )
+
 (deftest vhost-conf
   (testing 
     "original conf remains as unchanged as possible"
