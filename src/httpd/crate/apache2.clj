@@ -96,14 +96,19 @@
 
 (defn config-and-enable-vhost
   [vhost-name vhost-content]
+  (let [file-avail-name (str "/etc/apache2/sites-available/" vhost-name ".conf")
+        file-enabled-name (str "/etc/apache2/sites-enabled/" vhost-name ".conf")]
   (configure-file 
-    (str "/etc/apache2/sites-available/" vhost-name ".conf") 
+    file-avail-name
     vhost-content)
-   (pallet.actions/exec
-      {:language :bash}
-      (stevedore/script
-        ((str "a2ensite " ~vhost-name))
-      ))  
+  (actions/plan-when-not 
+    (stevedore/script (file-exists? ~file-enabled-name)) 
+    (pallet.actions/exec
+       {:language :bash}
+       (stevedore/script
+         ((str "a2ensite " ~vhost-name))
+       ))
+    ))
   )
 
 (defn install-apache2
