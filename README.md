@@ -14,11 +14,13 @@ that probably won't be for a while.
 This crate is working with:
  * pallet0.8
  * ubuntu 14.04
- * apache httpd 2.
+ * apache httpd 2.4
 
 ## Features
  * creation of complex vhost files
- * secure https (gnutls) config - proven at https://www.ssllabs.com/ssltest/
+ * use https (gnutls). Config is proven at https://www.ssllabs.com/ssltest/
+ * use proxy_http
+ * use basic authentication 
  * production grade apache hardening
  
 ## Usage Examples
@@ -27,6 +29,7 @@ This crate is working with:
   []
   (apache2/install-apache2)
   (gnutls/install-mod-gnutls)
+  (proxy/install-mod-proxy-http)
   )
 
 (defn configure-webserver
@@ -34,24 +37,46 @@ This crate is working with:
              domain-cert 
              domain-key 
              ca-cert]}]
+  
   (apache2/config-apache2-production-grade
     :security 
     (apache2/security))
+    
   (gnutls/configure-gnutls-credentials
     :domain-name domain-name
     :domain-cert domain-cert
     :domain-key domain-key
     :ca-cert ca-cert)
+    
   (apache2/config-and-enable-vhost
     "000-default"
     (vhost/vhost-conf-default-redirect-to-https-only
       :domain-name domain-name  
       :server-admin-email (str "admin@" domain-name)))
+  
   (apache2/config-and-enable-vhost
     "000-default-ssl"
-    (some-own-vhost-definition
-      :domain-name domain-name  
-      :server-admin-email (str "admin@" domain-name)))
+     (into 
+    	[]
+    	(concat
+      	(vhost/vhost-head :listening-port "443"
+        	          	  :domain-name "domain-name" 
+            	          :server-admin-email "server-admin-email")
+      	(proxy/vhost-proxy
+        	:target-port "app-port") 
+      	(vhost/vhost-location
+        	:location-options
+        	(auth/vhost-basic-auth-options
+          	:domain-name "domain-name"))
+      	(vhost/vhost-log 
+      		:error-name "error.log"
+        	:log-name "ssl-access.log"
+            :log-format "combined")
+      	(gnutls/vhost-gnutls "domain-name")
+      	vhost/vhost-tail
+      	)
+    )
+    
   )
 
 ## TODO's
@@ -60,24 +85,11 @@ This crate is working with:
  * maintainance page in case of appserver frontend
  * googles web-id
  * mod-jk configuration
- * basic auth
  * taller monitoring configs
   
 
 ### some config snippets to be realized on demand
-* config phase @vhost: 
-  * support for base auth
-  
-   <Location />
-    Order deny,allow
-    Deny from <%= deny_from %>
-    AuthType Basic     
-    AuthName "<%= fqdn %>" 
-    
-    Satisfy Any
-    AuthUserFile <%= base_auth_target %>
-    Require valid-user
-  </Location>
+* config phase @vhost:
   
   * support for google-website-id
   
