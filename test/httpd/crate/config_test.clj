@@ -10,7 +10,7 @@
   (:require
     [clojure.test :refer :all]
     [pallet.actions :as actions]
-    [httpd.crate.config :as sut]
+    [httpd.crate.vhost :as vhost]
     ))
 
 (deftest vhost-head
@@ -21,7 +21,7 @@
           "ServerName owncloud.politaktiv.org"
           "ServerAdmin admin@owncloud.politaktiv.org"
           ""]
-         (sut/vhost-head
+         (vhost/vhost-head
            :domain-name "owncloud.politaktiv.org"
            )
          )
@@ -59,7 +59,7 @@
           "RewriteRule ^/(.+)$ http://localhost:80/$1 [P]" 
           "" 
           "</VirtualHost>"]
-         (sut/vhost-conf-default 
+         (vhost/vhost-conf-default 
            "owncloud.politaktiv.org" 
            "admin@politaktiv.org" 
            "/document-root"
@@ -89,7 +89,7 @@
           ""
           "</VirtualHost>"
           ]
-         (sut/vhost-conf-ssl-default 
+         (vhost/vhost-conf-ssl-default 
            :domain-name  "jira.intra.politaktiv.org" 
            :server-admin-email "webmaster@politaktiv.org"
            :ssl-module :gnutls)         
@@ -112,7 +112,7 @@
           "RewriteRule ^/(.*)$ https://%{SERVER_NAME}/$1 [R=301,L]"
           ""
           "</VirtualHost>"] 
-         (sut/vhost-conf-default-redirect-to-https-only
+         (vhost/vhost-conf-default-redirect-to-https-only
            :domain-name "owncloud.politaktiv.org" 
            :server-admin-email "admin@politaktiv.org")
          ))    
@@ -132,7 +132,7 @@
           "  allow from all"
           "</Directory>"
           ""]
-         (sut/vhost-directory 
+         (vhost/vhost-directory 
            "/var/www/owncloud/" 
            :directory-options 
            ["  Options Indexes FollowSymLinks MultiViews"
@@ -155,7 +155,7 @@
           "  Allow from all"
           "</Location>"
           ""]
-         (sut/vhost-location  
+         (vhost/vhost-location  
            :location-options 
            ["  Satisfy Any"
             "  Order deny,allow"

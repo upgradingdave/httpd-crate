@@ -9,7 +9,6 @@
 (ns httpd.crate.base-auth-test
   (:require
     [clojure.test :refer :all]
-    [pallet.actions :as actions]
     [httpd.crate.basic-auth :as sut]
     ))
 
