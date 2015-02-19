@@ -45,34 +45,3 @@
    "  Listen 443"
    "</IfModule>"
    ""])
-
-
-;; (defn- configure-file-and-enable
-;;   [file-name link-to-enable content]
-;;   (configure-file file-name content)
-;;   (actions/symbolic-link 
-;;     file-name 
-;;     link-to-enable
-;;     :action :create)
-;;   )
-
-;; (defn config-apache2-production-grade
-;;   [ & {:keys [limits 
-;;               security 
-;;               ports]
-;;        :or {limits limits
-;;             security security
-;;             ports ports}}]
-;;   (configure-file-and-enable "/etc/apache2/conf-available/limits.conf"
-;;                              "/etc/apache2/conf-enabled/limits.conf"
-;;                              limits)
-;;   (configure-file-and-enable "/etc/apache2/conf-available/security.conf"
-;;                              "/etc/apache2/conf-enabled/security.conf"
-;;                              security)  
-;;   (configure-file "/etc/apache2/ports.conf" ports)
-;;   (pallet.actions/exec
-;;       {:language :bash}
-;;       (stevedore/script
-;;         ("a2enmod headers")
-;;       ))
-;;   )

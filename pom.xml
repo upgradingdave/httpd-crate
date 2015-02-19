@@ -3,15 +3,15 @@
   <groupId>upgradingdave</groupId>
   <artifactId>httpd</artifactId>
   <packaging>jar</packaging>
-  <version>0.2.0-alpha.1</version>
+  <version>0.2.0-alpha.2-SNAPSHOT</version>
   <name>httpd</name>
   <description>Pallet crate to install and run Apache httpd</description>
   <scm>
-    <connection>scm:git:git://github.com/upgradingdave/httpd-crate.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/upgradingdave/httpd-crate.git</developerConnection>
-    <tag>e6a0ab93f10235c1eaa0dea669954baddcb5e031
+    <connection>scm:git:git://github.com/DomainDrivenArchitecture/httpd-crate.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/DomainDrivenArchitecture/httpd-crate.git</developerConnection>
+    <tag>c368ac063958fb51645f183820d0b5993412374f
 </tag>
-    <url>https://github.com/upgradingdave/httpd-crate</url>
+    <url>https://github.com/DomainDrivenArchitecture/httpd-crate</url>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>

@@ -19,6 +19,7 @@
     [pallet.stevedore :as stevedore]
     [httpd.crate.vhost :as vhost]
     [httpd.crate.cmds :as cmds]
+    [httpd.crate.config :as config]
 ))
 
 ;; Apache2 related pallet actions
@@ -44,6 +45,30 @@
   (configure-file (str "/etc/apache2/conf-available/" conf-file-name) 
                   content)
   (cmds/a2enconf conf-file-name))
+
+(defn config-apache2-production-grade
+   [ & {:keys [limits 
+               security 
+               ports]
+        :or {limits config/limits
+             security config/security
+             ports config/ports}}]
+   (configure-file-and-enable 
+     "/etc/apache2/conf-available/limits.conf"
+     "/etc/apache2/conf-enabled/limits.conf"
+     limits)
+   (configure-file-and-enable 
+     "/etc/apache2/conf-available/security.conf"
+     "/etc/apache2/conf-enabled/security.conf"
+     security)  
+   (configure-file 
+     "/etc/apache2/ports.conf" ports)
+   (pallet.actions/exec
+       {:language :bash}
+       (stevedore/script
+         ("a2enmod headers")
+         ))
+   )
 
 (defplan install-apache2
   "Install apache2 package."
