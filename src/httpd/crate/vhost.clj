@@ -22,16 +22,22 @@
   )
 
 (defn vhost-head
-  [& {:keys [listening-port
+  "listening spec may be: x.x.x.x:443 [x6:x6:x6:x6:x6:x6:x6:x6]:443"
+  [& {:keys [listening-spec
+             listening-interface
+             listening-port
              domain-name 
              server-admin-email
              aliases]
-      :or {listening-port "80"}}]
+      :or {listening-interface "*"
+           listening-port "80"}}]
   (let [used-server-admin-email (if server-admin-email
                                   server-admin-email
                                   (str "admin@" domain-name))]
     (concat
-      [(str "<VirtualHost *:" listening-port ">")
+      [(if listening-spec
+         (str "<VirtualHost " listening-spec ">")
+         (str "<VirtualHost " listening-interface ":" listening-port ">"))
        (str "ServerName " domain-name)]
       (vhost-server-alias aliases)
       [(str "ServerAdmin " used-server-admin-email)

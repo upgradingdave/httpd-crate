@@ -54,15 +54,14 @@
              security config/security
              ports config/ports}}]
    (configure-file-and-enable 
-     "/etc/apache2/conf-available/limits.conf"
-     "/etc/apache2/conf-enabled/limits.conf"
+     "limits.conf"
      limits)
    (configure-file-and-enable 
-     "/etc/apache2/conf-available/security.conf"
-     "/etc/apache2/conf-enabled/security.conf"
+     "security.conf"
      security)  
    (configure-file 
-     "/etc/apache2/ports.conf" ports)
+     "/etc/apache2/ports.conf" 
+     ports)
    (pallet.actions/exec
        {:language :bash}
        (stevedore/script
