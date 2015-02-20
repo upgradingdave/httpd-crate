@@ -46,6 +46,20 @@
                   content)
   (cmds/a2enconf conf-file-name))
 
+(defn configure-and-enable-vhost
+  ([vhost-name vhost-content]
+    (configure-and-enable-vhost vhost-name vhost-content "2.4"))
+  ([vhost-name vhost-content apache-version]
+    (let [file-avail-name 
+          (str "/etc/apache2/sites-available/" vhost-name ".conf")]
+      (configure-file file-avail-name vhost-content)
+      (cmds/a2ensite (if (= apache-version "2.2")
+                       (str vhost-name ".conf")
+                       vhost-name))
+      )
+    )
+  )
+
 (defn config-apache2-production-grade
    [ & {:keys [limits 
                security 
@@ -97,13 +111,6 @@
                                 :group "root"
                                 :mode "644"
                                 :content content)))
-
-(defn configure-and-enable-vhost
-  [vhost-name vhost-content]
-  (let [file-avail-name 
-        (str "/etc/apache2/sites-available/" vhost-name ".conf")]
-    (configure-file file-avail-name vhost-content)
-    (cmds/a2ensite vhost-name)))
 
 (def ^{:dynamic true} *default-settings*
   {})

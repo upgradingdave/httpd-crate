@@ -30,6 +30,7 @@
     :owner "root"
     :group "www-data"
     :mode "640"
+    :literal true
     :force true
     :content
     (string/join
