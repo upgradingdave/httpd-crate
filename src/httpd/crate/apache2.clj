@@ -83,17 +83,27 @@
          ))
    )
 
+
+(defn install-apache2-action
+  []
+  (actions/package "apache2"))
+
+
 (defplan install-apache2
   "Install apache2 package."
   [{:keys [instance-id]}]
   (let [settings (get-settings :httpd {:instance-id instance-id})]
-    (actions/package "apache2")))
+    (install-apache2-action)))
+
+(defn install-apachetop-action
+  []
+  (actions/package "apachetop"))
 
 (defplan install-apachetop
   "Install apachetop package."
   [{:keys [instance-id]}]
   (let [settings (get-settings :httpd {:instance-id instance-id})]
-    (actions/package "apachetop")))
+    (install-apachetop-action)))
 
 (defn deploy-site
   "Deploy simple static index.html site to apache2. TODO: update this
