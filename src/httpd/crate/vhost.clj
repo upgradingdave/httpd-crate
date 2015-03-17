@@ -10,7 +10,8 @@
 
 (ns httpd.crate.vhost
   (:require [clojure.string :as string]
-            [httpd.crate.mod-gnutls :as gnutls]))
+            [httpd.crate.mod-gnutls :as gnutls]
+            [httpd.crate.mod-rewrite :as rewrite]))
 
 (defn vhost-server-alias
   "Define aliases. For example if your domain-name is example.com, you
@@ -103,40 +104,6 @@
     )
    )
 
-(defn vhost-rewrite-rules
-  "Define the rewrite rules for a VirtualHost. Pass a vector of
-  rewrite rules like this:
-
-  :rewrite-rules [\"RewriteRule ^/$ http://test.com:8080 [P]\"
-                  \"RewriteRule ^/login$ http://test.com [P]\"]
-"
-  [rewrite-rules 
-   &{:keys [use-proxy]
-        :or {use-proxy true}}]
-  (if rewrite-rules
-    (concat
-      (if use-proxy 
-        ["ProxyRequests on"]
-        [])
-       ["RewriteEngine on"]
-      rewrite-rules
-      [""])
-    []
-    )
-  )
-
-(defn vhost-gnutls 
-  [domain-name]
-  ["GnuTLSEnable on"
-   "GnuTLSCacheTimeout 300"
-   "GnuTLSPriorities SECURE:!VERS-SSL3.0:!MD5:!DHE-RSA:!DHE-DSS:!AES-256-CBC:%COMPAT"
-   "GnuTLSExportCertificates on"
-   ""
-   (str "GnuTLSCertificateFile /etc/apache2/ssl.crt/" domain-name ".crts")
-   (str "GnuTLSKeyFile /etc/apache2/ssl.key/" domain-name ".key")
-   ""]
-  )
-
 (defn vhost-conf-default-redirect-to-https-only
   "Just redirect http request permanently to https"
   [& {:keys [domain-name 
@@ -157,7 +124,7 @@
       (vhost-log :error-name "error.log"
                  :log-name "access.log"
                  :log-format "combined")
-      (vhost-rewrite-rules 
+      (rewrite/vhost-rewrite-rules 
         ["RewriteCond %{HTTPS} !on"
          "RewriteRule ^/(.*)$ https://%{SERVER_NAME}/$1 [R=301,L]"]
         :use-proxy false)
@@ -209,7 +176,7 @@
       (vhost-log :domain-name domain-name)
       (vhost-location :path "/")
       (vhost-directory document-root-path)
-      (vhost-rewrite-rules 
+      (rewrite/vhost-rewrite-rules 
         [(str "RewriteRule ^/$ http://localhost:" port "/ [P]")
          (str "RewriteRule ^/(.+)$ http://localhost:" port "/$1 [P]")])
       vhost-tail
