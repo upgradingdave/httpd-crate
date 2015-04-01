@@ -24,7 +24,7 @@
 "
   [rewrite-rules 
    &{:keys [use-proxy]
-        :or {use-proxy true}}]
+     :or {use-proxy true}}]
   (if rewrite-rules
     (concat
       (if use-proxy 

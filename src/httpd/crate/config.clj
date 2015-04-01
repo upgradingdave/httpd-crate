@@ -21,13 +21,7 @@
   ""])
 
 (def security
-  ["<Directory />"
-   "  Options FollowSymLinks"
-   "  AllowOverride FileInfo"
-   "  Require all granted"
-   "</Directory>"
-   "" 
-   "ServerTokens Prod"
+  ["ServerTokens Prod"
    "ServerSignature On"
    "TraceEnable Off"
    "Header set X-Content-Type-Options: \"nosniff\""

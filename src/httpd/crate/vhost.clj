@@ -61,13 +61,14 @@
                 :or {directory-options
                      ["  Order allow,deny"
                       "  Allow from all"]}}]
-  (into []
-        (concat
-          [(str "<Directory \"" file-path "\">")]
-          directory-options
-          ["</Directory>"
-           ""]
-          ))
+  (into 
+    []
+    (concat
+      [(str "<Directory \"" file-path "\">")]
+      directory-options
+      ["</Directory>"
+       ""]
+      ))
   )
 
 (defn vhost-location
