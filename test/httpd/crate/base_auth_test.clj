@@ -15,14 +15,29 @@
 (deftest vhost-basic-auth-options
   (testing
     (is 
-      (= ["Deny from all"
-          "AuthUserFile /etc/apache2/htpasswd-owncloud.politaktiv.org"
-          "AuthName \"Authorization for owncloud.politaktiv.org\""
-          "AuthType Basic"
-          "Satisfy Any"
-          "require valid-user"] 
+      (= ["AuthName \"Authorization for owncloud.politaktiv.org\"" 
+          "AuthType Basic" 
+          "AuthBasicProvider file" 
+          "AuthUserFile /etc/apache2/htpasswd-owncloud.politaktiv.org" 
+          "Require valid-user"] 
          (sut/vhost-basic-auth-options 
            :domain-name "owncloud.politaktiv.org")         
+         ))
+    )
+  
+  (testing
+    (is 
+      (= ["AuthName \"Authorization for owncloud.politaktiv.org\"" 
+          "AuthType Basic" 
+          "AuthBasicProvider file" 
+          "AuthUserFile /etc/apache2/htpasswd-owncloud.politaktiv.org" 
+          "Require env auth_not_required"
+          "Require valid-user"] 
+         (sut/vhost-basic-auth-options 
+           :domain-name "owncloud.politaktiv.org"
+           :authz-options
+           ["Require env auth_not_required"
+            "Require valid-user"])         
          ))
     )
   )
