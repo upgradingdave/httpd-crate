@@ -28,7 +28,7 @@
     (concat
       additional-directives
       [(str "ProxyPass " mapped-url-path " http://" target-host ":" target-port "/")
-      (str "ProxyPassReverse " mapped-url-path " http://" target-host ":" target-port "/")]
+       (str "ProxyPassReverse " mapped-url-path " http://" target-host ":" target-port "/")]
       ))
   )
 

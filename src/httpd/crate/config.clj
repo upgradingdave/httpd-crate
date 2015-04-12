@@ -10,17 +10,17 @@
 
 (ns httpd.crate.config)
 
-(def limits
+(def ^:dynamic limits
   ["ServerLimit 150"
    "MaxClients  150"])
 
-(def loadtest-logging
+(def ^:dynamic loadtest-logging
   ["# Format is: [remote host] [remote logname] [remote user] [request time] \"[first request line]\" [status]" 
    "# [respionse size in bytes] \"[referer]\" \"[user agent]\" [processtime in microseconds]"
    "LogFormat \"%h %l %u %t \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-agent}i\\\" %D\" loadtest"
   ""])
 
-(def security
+(def ^:dynamic security
   ["ServerTokens Prod"
    "ServerSignature On"
    "TraceEnable Off"
@@ -28,7 +28,7 @@
    "Header set X-Frame-Options: \"sameorigin\""
 ])
 
-(def ports
+(def ^:dynamic ports
   ["Listen 80"
    ""
    "<IfModule mod_ssl.c>"
