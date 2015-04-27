@@ -18,12 +18,11 @@
     "default admins emailadress"
     (is 
       (= ["<VirtualHost *:80>"
-          "ServerName owncloud.politaktiv.org"
-          "ServerAdmin admin@owncloud.politaktiv.org"
-          ""]
+          "  ServerName owncloud.politaktiv.org"
+          "  ServerAdmin admin@owncloud.politaktiv.org"
+          "  "]
          (vhost/vhost-head
-           :domain-name "owncloud.politaktiv.org"
-           )
+           :domain-name "owncloud.politaktiv.org")
          )
       ))
   )
@@ -33,31 +32,31 @@
     "original conf remains as unchanged as possible"
     (is 
       (= ["<VirtualHost *:80>"
-          "ServerName owncloud.politaktiv.org"
-          "ServerAlias alias1 alias2"
-          "ServerAdmin admin@politaktiv.org"
-          ""
-          "DocumentRoot \"/document-root\""
-          ""
-          "ErrorLog \"/var/log/apache2/owncloud.politaktiv.org-error\"" 
-          "LogLevel warn" 
-          "CustomLog \"/var/log/apache2/owncloud.politaktiv.org-access_log\" common"
-          ""
-          "<Location />" 
-          "  Order allow,deny" 
-          "  Allow from all" 
-          "</Location>"
-          ""
-          "<Directory \"/document-root\">"
-          "  Order allow,deny"
-          "  Allow from all"
-          "</Directory>" 
-          ""
-          "ProxyRequests on" 
-          "RewriteEngine on" 
-          "RewriteRule ^/$ http://localhost:80/ [P]" 
-          "RewriteRule ^/(.+)$ http://localhost:80/$1 [P]" 
-          "" 
+          "  ServerName owncloud.politaktiv.org"
+          "  ServerAlias alias1 alias2"
+          "  ServerAdmin admin@politaktiv.org"
+          "  "
+          "  DocumentRoot \"/document-root\""
+          "  "
+          "  ErrorLog \"/var/log/apache2/owncloud.politaktiv.org-error\"" 
+          "  LogLevel warn" 
+          "  CustomLog \"/var/log/apache2/owncloud.politaktiv.org-access_log\" common"
+          "  "
+          "  <Location />" 
+          "    Order allow,deny" 
+          "    Allow from all" 
+          "  </Location>"
+          "  "
+          "  <Directory \"/document-root\">"
+          "    Order allow,deny"
+          "    Allow from all"
+          "  </Directory>" 
+          "  "
+          "  ProxyRequests on" 
+          "  RewriteEngine on" 
+          "  RewriteRule ^/$ http://localhost:80/ [P]" 
+          "  RewriteRule ^/(.+)$ http://localhost:80/$1 [P]" 
+          "  " 
           "</VirtualHost>"]
          (vhost/vhost-conf-default 
            "owncloud.politaktiv.org" 
@@ -72,21 +71,21 @@
     "a simple https config"
     (is 
       (= ["<VirtualHost *:443>"
-          "ServerName jira.intra.politaktiv.org"
-          "ServerAdmin webmaster@politaktiv.org"
-          ""
-          "ErrorLog \"/var/log/apache2/error.log\"" 
-          "LogLevel warn" 
-          "CustomLog \"/var/log/apache2/ssl-access.log\" combined"
-          ""
-          "GnuTLSEnable on"
-          "GnuTLSCacheTimeout 300"
-          "GnuTLSPriorities SECURE:!VERS-SSL3.0:!MD5:!DHE-RSA:!DHE-DSS:!AES-256-CBC:%COMPAT"
-          "GnuTLSExportCertificates on"
-          ""
-          "GnuTLSCertificateFile /etc/apache2/ssl.crt/jira.intra.politaktiv.org.certs"
-          "GnuTLSKeyFile /etc/apache2/ssl.key/jira.intra.politaktiv.org.key"
-          ""
+          "  ServerName jira.intra.politaktiv.org"
+          "  ServerAdmin webmaster@politaktiv.org"
+          "  "
+          "  ErrorLog \"/var/log/apache2/error.log\"" 
+          "  LogLevel warn" 
+          "  CustomLog \"/var/log/apache2/ssl-access.log\" combined"
+          "  "
+          "  GnuTLSEnable on"
+          "  GnuTLSCacheTimeout 300"
+          "  GnuTLSPriorities SECURE:!VERS-SSL3.0:!MD5:!DHE-RSA:!DHE-DSS:!AES-256-CBC:%COMPAT"
+          "  GnuTLSExportCertificates on"
+          "  "
+          "  GnuTLSCertificateFile /etc/apache2/ssl.crt/jira.intra.politaktiv.org.certs"
+          "  GnuTLSKeyFile /etc/apache2/ssl.key/jira.intra.politaktiv.org.key"
+          "  "
           "</VirtualHost>"
           ]
          (vhost/vhost-conf-ssl-default 
@@ -100,17 +99,17 @@
     "http -> https"
     (is 
       (= ["<VirtualHost *:80>"
-          "ServerName owncloud.politaktiv.org"
-          "ServerAdmin admin@politaktiv.org"
-          ""
-          "ErrorLog \"/var/log/apache2/error.log\"" 
-          "LogLevel warn" 
-          "CustomLog \"/var/log/apache2/access.log\" combined"
-          ""
-          "RewriteEngine on"
-          "RewriteCond %{HTTPS} !on"
-          "RewriteRule ^/(.*)$ https://%{SERVER_NAME}/$1 [R=301,L]"
-          ""
+          "  ServerName owncloud.politaktiv.org"
+          "  ServerAdmin admin@politaktiv.org"
+          "  "
+          "  ErrorLog \"/var/log/apache2/error.log\"" 
+          "  LogLevel warn" 
+          "  CustomLog \"/var/log/apache2/access.log\" combined"
+          "  "
+          "  RewriteEngine on"
+          "  RewriteCond %{HTTPS} !on"
+          "  RewriteRule ^/(.*)$ https://%{SERVER_NAME}/$1 [R=301,L]"
+          "  "
           "</VirtualHost>"] 
          (vhost/vhost-conf-default-redirect-to-https-only
            :domain-name "owncloud.politaktiv.org" 
@@ -135,12 +134,12 @@
          (vhost/vhost-directory 
            "/var/www/owncloud/" 
            :directory-options 
-           ["  Options Indexes FollowSymLinks MultiViews"
-            "  AllowOverride All"
-            "  SetEnv MOD_X_SENDFILE_ENABLED 1"
-            "  XSendFile On"
-            "  Order allow,deny"
-            "  allow from all"])
+           ["Options Indexes FollowSymLinks MultiViews"
+            "AllowOverride All"
+            "SetEnv MOD_X_SENDFILE_ENABLED 1"
+            "XSendFile On"
+            "Order allow,deny"
+            "allow from all"])
          ))
     )
   )
@@ -157,9 +156,9 @@
           ""]
          (vhost/vhost-location  
            :location-options 
-           ["  Satisfy Any"
-            "  Order deny,allow"
-            "  Allow from all"])
+           ["Satisfy Any"
+            "Order deny,allow"
+            "Allow from all"])
          ))
     )
   )

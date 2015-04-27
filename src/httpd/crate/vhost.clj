@@ -10,6 +10,7 @@
 
 (ns httpd.crate.vhost
   (:require [clojure.string :as string]
+            [httpd.crate.common :as common]
             [httpd.crate.mod-gnutls :as gnutls]
             [httpd.crate.mod-rewrite :as rewrite]))
 
@@ -32,19 +33,24 @@
              aliases]
       :or {listening-interface "*"
            listening-port "80"}}]
-  (let [used-server-admin-email (if server-admin-email
-                                  server-admin-email
-                                  (str "admin@" domain-name))]
-    (concat
+  (let [used-server-admin-email 
+        (if server-admin-email
+          server-admin-email
+          (str "admin@" domain-name))]
+    (into 
       [(if listening-spec
          (str "<VirtualHost " listening-spec ">")
-         (str "<VirtualHost " listening-interface ":" listening-port ">"))
-       (str "ServerName " domain-name)]
-      (vhost-server-alias aliases)
-      [(str "ServerAdmin " used-server-admin-email)
-       ""]
-      ))
-  )
+         (str "<VirtualHost " listening-interface ":" listening-port ">"))]
+      (common/prefix 
+        "  " 
+        (into []
+              (concat 
+                [(str "ServerName " domain-name)]
+                (vhost-server-alias aliases)
+                [(str "ServerAdmin " used-server-admin-email)
+                 ""])))
+      )
+  ))
 
 (def vhost-tail ["</VirtualHost>"])
 
@@ -59,13 +65,15 @@
 (defn vhost-directory
   [file-path & {:keys [directory-options]
                 :or {directory-options
-                     ["  Order allow,deny"
-                      "  Allow from all"]}}]
+                     ["Order allow,deny"
+                      "Allow from all"]}}]
   (into 
     []
     (concat
       [(str "<Directory \"" file-path "\">")]
-      directory-options
+      (common/prefix 
+          "  "
+          directory-options)
       ["</Directory>"
        ""]
       ))
@@ -77,12 +85,14 @@
              location-options]
       :or {path "/"
            location-options
-           ["  Order allow,deny"
-            "  Allow from all"]}}]
+           ["Order allow,deny"
+            "Allow from all"]}}]
    (into []
         (concat
           [(str "<Location " path ">")]
-          location-options
+          (common/prefix 
+            "  "
+            location-options)
           ["</Location>"
           ""]))
    )
@@ -121,14 +131,19 @@
                   :domain-name domain-name 
                   :server-admin-email server-admin-email
                   :aliases aliases)
-      (vhost-document-root document-root-path)
-      (vhost-log :error-name "error.log"
-                 :log-name "access.log"
-                 :log-format "combined")
-      (rewrite/vhost-rewrite-rules 
-        ["RewriteCond %{HTTPS} !on"
-         "RewriteRule ^/(.*)$ https://%{SERVER_NAME}/$1 [R=301,L]"]
-        :use-proxy false)
+      (common/prefix 
+          "  "
+          (into 
+            []
+            (concat
+              (vhost-document-root document-root-path)
+              (vhost-log :error-name "error.log"
+                         :log-name "access.log"
+                         :log-format "combined")
+              (rewrite/vhost-rewrite-rules 
+                ["RewriteCond %{HTTPS} !on"
+                 "RewriteRule ^/(.*)$ https://%{SERVER_NAME}/$1 [R=301,L]"]
+                :use-proxy false))))
       vhost-tail
       )
     )
@@ -152,13 +167,18 @@
                   :domain-name domain-name 
                   :server-admin-email server-admin-email
                   :aliases aliases)
-      (vhost-document-root document-root-path)
-      (vhost-log :error-name "error.log"
+      (common/prefix 
+          "  "
+          (into 
+            []
+            (concat
+              (vhost-document-root document-root-path)
+              (vhost-log :error-name "error.log"
                  :log-name "ssl-access.log"
                  :log-format "combined")
-      (if (= ssl-module :gnutls)
-        (gnutls/vhost-gnutls domain-name)
-        )        
+              (if (= ssl-module :gnutls)
+                (gnutls/vhost-gnutls domain-name)
+                ))))   
       vhost-tail
       )
     )
@@ -173,13 +193,19 @@
       (vhost-head :domain-name domain-name 
                   :server-admin-email server-admin-email
                   :aliases aliases)
-      (vhost-document-root document-root-path)  
-      (vhost-log :domain-name domain-name)
-      (vhost-location :path "/")
-      (vhost-directory document-root-path)
-      (rewrite/vhost-rewrite-rules 
-        [(str "RewriteRule ^/$ http://localhost:" port "/ [P]")
-         (str "RewriteRule ^/(.+)$ http://localhost:" port "/$1 [P]")])
+      (common/prefix 
+          "  "
+          (into 
+            []
+            (concat
+              (vhost-document-root document-root-path)
+              (vhost-log :domain-name domain-name)
+              (vhost-location :path "/")
+              (vhost-directory document-root-path)
+              (rewrite/vhost-rewrite-rules 
+                [(str "RewriteRule ^/$ http://localhost:" port "/ [P]")
+                 (str "RewriteRule ^/(.+)$ http://localhost:" port "/$1 [P]")])
+              )))
       vhost-tail
       )
     )

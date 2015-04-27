@@ -21,18 +21,18 @@
 
   :rewrite-rules [\"RewriteRule ^/$ http://test.com:8080 [P]\"
                   \"RewriteRule ^/login$ http://test.com [P]\"]
-"
+  "
   [rewrite-rules 
    &{:keys [use-proxy]
      :or {use-proxy true}}]
   (if rewrite-rules
-    (concat
-      (if use-proxy 
-        ["ProxyRequests on"]
-        [])
-       ["RewriteEngine on"]
-      rewrite-rules
-      [""])
+    (into []
+          (concat
+            (if use-proxy 
+              ["ProxyRequests on"]
+              [])
+            ["RewriteEngine on"]
+            rewrite-rules
+            [""]))
     []
-    )
-  )
+    ))
