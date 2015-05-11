@@ -1,4 +1,4 @@
-(defproject upgradingdave/httpd "0.2.0-alpha.2-SNAPSHOT"
+(defproject org.domaindrivenarchitecture/httpd "0.2.0-alpha.2-SNAPSHOT"
   :description "Pallet crate to install and run Apache httpd"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [com.palletops/pallet "0.8.0-RC.9"]
@@ -28,5 +28,5 @@
              {:dependencies [[org.slf4j/jcl-over-slf4j "1.7.2"]]
               :exclusions [commons-logging]}}
   :local-repo-classpath true
-  :repositories
-  {"sonatype" "https://oss.sonatype.org/content/repositories/releases/"})
+  :repositories {"clojars" "http://clojars.org/repo/"}
+  )
