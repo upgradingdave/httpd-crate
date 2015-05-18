@@ -9,7 +9,7 @@
   <scm>
     <connection>scm:git:git://github.com/DomainDrivenArchitecture/httpd-crate.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/DomainDrivenArchitecture/httpd-crate.git</developerConnection>
-    <tag>00508f808868b115fe70bb225bdac240ed6038cd
+    <tag>8a2abdfc4112ff203902c09fd03bb3ed72d8a35b
 </tag>
     <url>https://github.com/DomainDrivenArchitecture/httpd-crate</url>
   </scm>

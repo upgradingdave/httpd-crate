@@ -126,6 +126,16 @@ Configure ports
             :compute s
             :phase (plan-fn (apache2/configure-file-and-enable
                              "ports.conf" conf/ports))))
+                             
+Setup mod_jk
+
+    (require '[httpd.crate.mod-jk :as jk])
+    (session-summary
+      (pallet.api/converge {apache2 1}
+          :compute s
+          :phase (plan-fn (gnutls/install-mod-jk)
+                          (gnutls/configure-jk-worker))))
+
 
 Setup vhosts. Here's an example of a fairly complicted vhost: 
 
@@ -165,7 +175,6 @@ for creating content to pass to `apache2/configure-and-enable-vhost`
  * config of max-clients
  * maintainance page in case of appserver frontend
  * googles web-id
- * mod-jk configuration
  * taller monitoring configs
 
 ### some config snippets to be realized on demand
@@ -176,9 +185,6 @@ for creating content to pass to `apache2/configure-and-enable-vhost`
    Alias /<%= google_token %>.html "/var/www/static/google/<%= google_token %>.html"
 
  * conf phase @ server:
-  * mod-jk
-   * mods/jk
-   * etc/libapache2-mod-jk/workers.properties
   * maintainance-page
    * error
    * /var/www/static

@@ -14,17 +14,17 @@
     ))
 
 (defn vhost-jk-mount
-  [& {:keys [mount-path worker]
-      :or {mount-path "/*"
+  [& {:keys [path worker]
+      :or {path "/*"
            worker "mod_jk_www"}}]
-  [(str "JkMount " mount-path  " " worker)]
+  [(str "JkMount " path  " " worker)]
   )
 
 (defn vhost-jk-unmount
-  [& {:keys [mount-path worker]
-      :or {mount-path "/*"
+  [& {:keys [path worker]
+      :or {path "/*"
            worker "mod_jk_www"}}]
-  [(str "JkUnMount " mount-path  " " worker)]
+  [(str "JkUnMount " path  " " worker)]
   )
 
 (defn vhost-jk-status-location
@@ -99,8 +99,34 @@
    "</IfModule>"])
 
 
+(defn configure-mod-jk-worker
+  []
+  (actions/remote-file
+    "/etc/libapache2-mod-jk/workers.properties"
+    :owner "root"
+    :group "root"
+    :mode "644"
+    :force true
+    :content 
+    (string/join
+      \newline
+      (workers-configuration)
+      ))
+  )
+
 (defn install-mod-jk
   []
   (actions/package "libapache2-mod-jk")
+  (actions/remote-file
+    "/etc/apache2/mods-available/jk.conf"
+    :owner "root"
+    :group "root"
+    :mode "644"
+    :force true
+    :content 
+    (string/join
+      \newline
+      (mod-jk-configuration)
+      ))  
   (cmds/a2enmod "jk")
   )
