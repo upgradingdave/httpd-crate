@@ -19,13 +19,13 @@
     (is 
       (= ["JkMount /* mod_jk_www"]
          (sut/vhost-jk-mount
-           :mount-path "/*"
+           :path "/*"
            :worker "mod_jk_www")
          ))
     (is 
       (= ["JkUnMount /error/* mod_jk_www"]
          (sut/vhost-jk-unmount
-           :mount-path "/error/*"
+           :path "/error/*"
            :worker "mod_jk_www")
          ))
     )
