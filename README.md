@@ -170,27 +170,6 @@ There are a few other fn's inside `apache2.crate.vhost` such as
 `vhost/vhost-conf-default-redirect-to-https-only` that are convenient
 for creating content to pass to `apache2/configure-and-enable-vhost`
 
-## TODO's
-
- * config of max-clients
- * maintainance page in case of appserver frontend
- * googles web-id
- * taller monitoring configs
-
-### some config snippets to be realized on demand
-* config phase @vhost:
-  
-  * support for google-website-id
-  
-   Alias /<%= google_token %>.html "/var/www/static/google/<%= google_token %>.html"
-
- * conf phase @ server:
-  * maintainance-page
-   * error
-   * /var/www/static
-  * config of max-clients (including maxfiles)
-
-
 ## License
 
 Copyright © 2015, Dave Paroulek
