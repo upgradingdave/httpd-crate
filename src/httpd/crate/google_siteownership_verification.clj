@@ -26,7 +26,7 @@
       )))
 
 (defn configure-ownership-verification
-  [{:keys [id]}]
+  [& {:keys [id]}]
   (actions/directory
     "/var/www/static/google"
     :path true
