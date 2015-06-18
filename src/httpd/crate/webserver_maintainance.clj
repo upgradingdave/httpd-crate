@@ -13,69 +13,69 @@
   [httpd.crate.mod-jk :as jk]            
   [pallet.actions :as actions]))
 
-(defn vhost-service-unavailable-error-page
- [& {:keys [error-html-file consider-jk]
-    :or {consider-jk false
-        error-html-file "/error/503.html"}}]
- (into 
-  []
-  (concat
-   [(str "ErrorDocument 503 " error-html-file)
-   "Alias /error \"/var/www/static/error\""]
-   (if consider-jk 
-    (jk/vhost-jk-unmount :path "/error/*")
-    [])
-   [""]
-   )))
+;default maintainance error page content
+(def var-www-static-error-503-html
+  ["<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">"
+   "<html>"
+   "<head>"
+   "<title>Maintainance</title>"
+   "<meta name=\"ROBOTS\" content=\"NOINDEX, NOFOLLOW\">"
+   "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">"
+   "<meta http-equiv=\"content-type\" content=\"application/xhtml+xml; charset=UTF-8\">"
+   "<meta http-equiv=\"content-style-type\" content=\"text/css\">"
+   "<meta http-equiv=\"expires\" content=\"0\">"
+   "        <style type=\"text/css\">"
+   "                * {background-color: #EEF0F2}"
+   "        </style>"
+   "</head>"
+   "<body>"
+   "        <center>"
+   "                <h1>We thank you for your interest! </h1>"
+   "                <h2>The site is temporarily unavailable due to maintenance. </h2>"
+   "                <p>Thank you for your understanding and your patience! </p>"
+   "        </center>"
+   "</body>"
+   "</html>"
+   ]
+  )
 
-(defn install-maintainance-default-page-var-www
-  []
+
+
+(defn write-maintainance-file
+   [& {:keys [content]
+    :or {content var-www-static-error-503-html}}]
+   (actions/directory
+     "/var/www/static/error"
+     :action :create
+     :mode "644"
+     :owner "root"
+     :group "www-data")
   (actions/remote-file
     "/var/www/static/error/503.html"
+    :action :create
+    :overwrite-changes true
     :mode "644"
     :literal true
     :owner "root" 
     :group "www-data"
     :content (cloj-str/join
                \newline
-               ["<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">"
-                "<html>"
-                "<head>"
-                "<title>politaktiv.org in Wartung</title>"
-                "<meta name=\"ROBOTS\" content=\"NOINDEX, NOFOLLOW\">"
-                "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">"
-                "<meta http-equiv=\"content-type\" content=\"application/xhtml+xml; charset=UTF-8\">"
-                "<meta http-equiv=\"content-style-type\" content=\"text/css\">"
-                "<meta http-equiv=\"expires\" content=\"0\">"
-                "        <style type=\"text/css\">"
-                "                * {background-color: #EEF0F2}"
-                "        </style>"
-                "</head>"
-                "<body>"
-                "        <center>"
-                "                <h1> Wir danken Ihnen für Ihr Interesse! </h1>"
-                "                <img src=politaktiv_logo.png>"
-                "                <h2>Leider ist PolitAktiv wegen Wartungsarbeiten kurzfristig nicht erreichbar. </h2>"
-                "                Wartungsarbeiten an "
-                "                unserer Seite finden üblicherwiese <u>Freitags von 8:00Uhr-10:00Uhr</u> statt.<br>"
-                "                <br>"
-                "                Falls Sie sich über PolitAktiv informieren wollen, <br>"
-                "                besuchen Sie bitte "
-                "                das <a href=\"http://www.humanithesia.org/index.php/edemocracy/politaktiv.html\">"
-                "                        Diskussionsportal der Integrata-Stiftung "
-                "                    </a>"
-                "                die das Projekt \"PolitAktiv\" leitet. <br>"
-                "                <br>"
-                "                Vorschläge zur Seite oder dem Projekt an sich sind im"
-                "                <a href=\"http://www.humanithesia.org/index.php/forum-a/29-edemocracy-allgemein.html\">"
-                "                dortigen Forum"
-                "                </a> sehr willkommen.<br>"
-                "                <br>"
-                "                Vielen Dank für Ihr Verständnis!"
-                "        </center>"
-                "</body>"
-                "</html>"
-                ]
+               content
                )
     )
   )
+
+(defn vhost-service-unavailable-error-page
+ [& {:keys [consider-jk]
+    :or {consider-jk false}}]
+ (into 
+  []
+  (concat
+   [(str "ErrorDocument 503 " "/error/503.html")
+   "Alias /error \"/var/www/static/error\""]
+   (if consider-jk 
+    (jk/vhost-jk-unmount :path "/error/*")
+    [])
+   [""]
+   ))
+ )
