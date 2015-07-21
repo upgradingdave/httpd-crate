@@ -45,7 +45,10 @@
    "</Location>"])
 
 (defn workers-configuration
-  []
+  [& {:keys [worker host port]
+      :or {port "8009"
+           host "127.0.0.1"
+           worker "mod_jk_www"}}]
   ["# workers.tomcat_home should point to the location where you"                                                                                    
    "# installed tomcat. This is where you have your conf, webapps and lib"                                                                           
    "# directories."                                                                                                                                
@@ -64,13 +67,13 @@
    "#worker.loadbalancer.type=lb"
    "#worker.loadbalancer.balance_workers=mod_jk_www"
    ""
-   "worker.list=mod_jk_www"
-   "worker.mod_jk_www.port=8009"
-   "worker.mod_jk_www.host=127.0.0.1"
-   "worker.mod_jk_www.type=ajp13"
-   "worker.mod_jk_www.socket_timeout=900"
-   "worker.mod_jk_www.socket_keepalive=false"
-   "worker.mod_jk_www.connection_pool_timeout=100"
+   (str "worker.list=" worker)
+   (str "worker." worker ".port=8009" port)
+   (str "worker." worker ".host=" host)
+   (str "worker." worker ".type=ajp13")
+   (str "worker." worker ".socket_timeout=900")
+   (str "worker." worker ".socket_keepalive=false")
+   (str "worker." worker ".connection_pool_timeout=100")
    ""])
 
 (defn mod-jk-configuration
@@ -100,7 +103,8 @@
 
 
 (defn configure-mod-jk-worker
-  []
+  [& {:keys [workers-configuration]
+      :or {workers-configuration (workers-configuration)}}]
   (actions/remote-file
     "/etc/libapache2-mod-jk/workers.properties"
     :owner "root"
@@ -110,7 +114,7 @@
     :content 
     (string/join
       \newline
-      (workers-configuration)
+      workers-configuration
       ))
   )
 
