@@ -68,7 +68,7 @@
    "#worker.loadbalancer.balance_workers=mod_jk_www"
    ""
    (str "worker.list=" worker)
-   (str "worker." worker ".port=8009" port)
+   (str "worker." worker ".port=" port)
    (str "worker." worker ".host=" host)
    (str "worker." worker ".type=ajp13")
    (str "worker." worker ".socket_timeout=900")
