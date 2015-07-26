@@ -9,9 +9,11 @@
 
 (ns httpd.crate.config)
 
-(def ^:dynamic limits
-  ["ServerLimit 150"
-   "MaxClients  150"])
+(defn limits
+  [& {:keys [max-clients]
+      :or {max-clients "150"}}]
+  [(str "ServerLimit " max-clients)
+   (str "MaxClients  " max-clients)])
 
 (def ^:dynamic loadtest-logging
   ["# Format is: [remote host] [remote logname] [remote user] [request time] \"[first request line]\" [status]" 

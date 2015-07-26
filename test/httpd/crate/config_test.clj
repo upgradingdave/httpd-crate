@@ -11,6 +11,7 @@
     [clojure.test :refer :all]
     [pallet.actions :as actions]
     [httpd.crate.vhost :as vhost]
+    [httpd.crate.config :as config]
     ))
 
 (deftest vhost-head
@@ -162,4 +163,13 @@
          ))
     )
   )
-  
+
+(deftest limits
+  (testing 
+    "with additional options acording to newer apache config"
+    (is 
+      (= ["ServerLimit 150" 
+          "MaxClients  150"]
+         (config/limits)
+         ))
+    ))
