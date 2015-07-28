@@ -64,7 +64,7 @@
    [ & {:keys [limits 
                security 
                ports]
-        :or {limits config/limits
+        :or {limits (config/limits)
              security config/security
              ports config/ports}}]
    (configure-file-and-enable 
