@@ -28,5 +28,4 @@
              {:dependencies [[org.slf4j/jcl-over-slf4j "1.7.2"]]
               :exclusions [commons-logging]}}
   :local-repo-classpath true
-  :repositories {"clojars" "http://clojars.org/repo/"}
   )
