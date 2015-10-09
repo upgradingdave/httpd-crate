@@ -4,6 +4,10 @@
                  [com.palletops/pallet "0.8.0-RC.9"]
                  [ch.qos.logback/logback-classic "1.0.9"]
                  [com.palletops/pallet-vmfest "0.4.0-alpha.1"]]
+  :repositories [["snapshots" :clojars]
+                 ["releases" :clojars]]
+  :deploy-repositories [["snapshots" :clojars]
+                        ["releases" :clojars]]
   :profiles {:dev
              {:dependencies
               [[com.palletops/pallet "0.8.0-RC.9"
