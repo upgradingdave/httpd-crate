@@ -17,19 +17,17 @@
   (testing
     "create the correct ordered multi-cert"
     (is 
-      (= ["<IfModule mod_proxy.c>"
-          "  ProxyPass / http://localhost:8080/"
-          "  ProxyPassReverse / http://localhost:8080/"
-          "  ProxyPreserveHost On"
-          "</IfModule>"]
+      (= ["ProxyRequests     On" 
+          "ProxyPreserveHost On"
+          "ProxyPass / http://localhost:8080/"
+          "ProxyPassReverse / http://localhost:8080/"]
          (sut/vhost-proxy)         
          ))
     (is 
-      (= ["<IfModule mod_proxy.c>"
-          "  ProxyPass / http://on.other.host:1234/"
-          "  ProxyPassReverse / http://on.other.host:1234/"
-          "  ProxyPreserveHost On"
-          "</IfModule>"]
+      (= ["ProxyRequests     On" 
+          "ProxyPreserveHost On"
+          "ProxyPass / http://on.other.host:1234/"
+          "ProxyPassReverse / http://on.other.host:1234/"]
          (sut/vhost-proxy
            :target-host "on.other.host"
            :target-port "1234")         

@@ -26,6 +26,12 @@
   [vhost-conf]
   (pallet.actions/exec nil (str "a2ensite " vhost-conf)))
 
+(defn a2dissite
+  "Disable vhost site. vhost-conf should be the name of a conf file in
+  sites-available"
+  [vhost-conf]
+  (pallet.actions/exec nil (str "a2dissite " vhost-conf)))
+
 (defn a2enconf
   "Enable apache2 conf file. vhost-conf should be the name of a conf file in
   conf-available"

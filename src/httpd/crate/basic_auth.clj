@@ -30,6 +30,7 @@
     :owner "root"
     :group "www-data"
     :mode "640"
+    :literal true
     :force true
     :content
     (string/join
@@ -38,13 +39,16 @@
   )
 
 (defn vhost-basic-auth-options
-  [ & {:keys [domain-name]
+  [ & {:keys [domain-name
+              authz-options]
+       :or {authz-options ["Require valid-user"]}
        }]
   {:pre [(not (nil? domain-name))]}
-  ["Deny from all"
-   (str "AuthUserFile " (htpasswd-file-name domain-name))
-   (str "AuthName \"Authorization for " domain-name "\"")
-   "AuthType Basic"
-   "Satisfy Any"
-   "require valid-user"]  
-  )
+  (into 
+    []
+    (concat
+      [(str "AuthName \"Authorization for " domain-name "\"")
+       "AuthType Basic"
+       "AuthBasicProvider file"
+       (str "AuthUserFile " (htpasswd-file-name domain-name))]
+      authz-options)))

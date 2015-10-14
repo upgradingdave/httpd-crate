@@ -10,28 +10,31 @@
   (require 
     [clojure.string :as string]
     [pallet.actions :as actions]
-    [pallet.stevedore :as stevedore]
+    [httpd.crate.cmds :as cmds]
     ))
 
 (defn vhost-proxy
   [& {:keys [target-host
-             target-port]
+             target-port
+             mapped-url-path
+             additional-directives]
       :or {target-host "localhost"
-           target-port "8080"}}]
-  ["<IfModule mod_proxy.c>"
-   (str "  ProxyPass / http://" target-host ":" target-port "/")
-   (str "  ProxyPassReverse / http://" target-host ":" target-port "/")
-   "  ProxyPreserveHost On"
-   "</IfModule>"]
+           target-port "8080"
+           mapped-url-path "/"
+           additional-directives ["ProxyRequests     On"
+                                  "ProxyPreserveHost On"]}}]
+  (into 
+    []
+    (concat
+      additional-directives
+      [(str "ProxyPass " mapped-url-path " http://" target-host ":" target-port "/")
+       (str "ProxyPassReverse " mapped-url-path " http://" target-host ":" target-port "/")]
+      ))
   )
 
 (defn install-mod-proxy-http
   []
   (actions/package "libapache2-mod-proxy-html")
-  (pallet.actions/exec
-    {:language :bash}
-    (stevedore/script
-      ("a2enmod proxy_http")
-      ("a2enmod proxy"))
-    )
+  (cmds/a2enmod "proxy_http")
+  (cmds/a2enmod "proxy")
   )

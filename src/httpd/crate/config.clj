@@ -6,35 +6,30 @@
 ; the terms of this license.
 ; You must not remove this notice, or any other, from this software.
 ;
-;; Useful snippets for configuring apache2
 
 (ns httpd.crate.config)
 
-(def limits
-  ["ServerLimit 150"
-   "MaxClients  150"])
+(defn limits
+  [& {:keys [max-clients]
+      :or {max-clients "150"}}]
+  [(str "ServerLimit " max-clients)
+   (str "MaxClients  " max-clients)])
 
-(def loadtest-logging
+(def ^:dynamic loadtest-logging
   ["# Format is: [remote host] [remote logname] [remote user] [request time] \"[first request line]\" [status]" 
    "# [respionse size in bytes] \"[referer]\" \"[user agent]\" [processtime in microseconds]"
    "LogFormat \"%h %l %u %t \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-agent}i\\\" %D\" loadtest"
   ""])
 
-(def security
-  ["<Directory />"
-   "  Options FollowSymLinks"
-   "  AllowOverride FileInfo"
-   "  Require all granted"
-   "</Directory>"
-   "" 
-   "ServerTokens Prod"
+(def ^:dynamic security
+  ["ServerTokens Prod"
    "ServerSignature On"
    "TraceEnable Off"
    "Header set X-Content-Type-Options: \"nosniff\""
    "Header set X-Frame-Options: \"sameorigin\""
 ])
 
-(def ports
+(def ^:dynamic ports
   ["Listen 80"
    ""
    "<IfModule mod_ssl.c>"
@@ -45,34 +40,3 @@
    "  Listen 443"
    "</IfModule>"
    ""])
-
-
-;; (defn- configure-file-and-enable
-;;   [file-name link-to-enable content]
-;;   (configure-file file-name content)
-;;   (actions/symbolic-link 
-;;     file-name 
-;;     link-to-enable
-;;     :action :create)
-;;   )
-
-;; (defn config-apache2-production-grade
-;;   [ & {:keys [limits 
-;;               security 
-;;               ports]
-;;        :or {limits limits
-;;             security security
-;;             ports ports}}]
-;;   (configure-file-and-enable "/etc/apache2/conf-available/limits.conf"
-;;                              "/etc/apache2/conf-enabled/limits.conf"
-;;                              limits)
-;;   (configure-file-and-enable "/etc/apache2/conf-available/security.conf"
-;;                              "/etc/apache2/conf-enabled/security.conf"
-;;                              security)  
-;;   (configure-file "/etc/apache2/ports.conf" ports)
-;;   (pallet.actions/exec
-;;       {:language :bash}
-;;       (stevedore/script
-;;         ("a2enmod headers")
-;;       ))
-;;   )

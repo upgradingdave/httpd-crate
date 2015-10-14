@@ -19,6 +19,7 @@
     [pallet.stevedore :as stevedore]
     [httpd.crate.vhost :as vhost]
     [httpd.crate.cmds :as cmds]
+    [httpd.crate.config :as config]
 ))
 
 ;; Apache2 related pallet actions
@@ -45,17 +46,64 @@
                   content)
   (cmds/a2enconf conf-file-name))
 
+(defn configure-and-enable-vhost
+  ([vhost-name vhost-content]
+    (configure-and-enable-vhost vhost-name vhost-content "2.4"))
+  ([vhost-name vhost-content apache-version]
+    (let [file-avail-name 
+          (str "/etc/apache2/sites-available/" vhost-name ".conf")]
+      (configure-file file-avail-name vhost-content)
+      (cmds/a2ensite (if (= apache-version "2.2")
+                       (str vhost-name ".conf")
+                       vhost-name))
+      )
+    )
+  )
+
+(defn config-apache2-production-grade
+   [ & {:keys [limits 
+               security 
+               ports]
+        :or {limits (config/limits)
+             security config/security
+             ports config/ports}}]
+   (configure-file-and-enable 
+     "limits.conf"
+     limits)
+   (configure-file-and-enable 
+     "security.conf"
+     security)  
+   (configure-file 
+     "/etc/apache2/ports.conf" 
+     ports)
+   (pallet.actions/exec
+       {:language :bash}
+       (stevedore/script
+         ("a2enmod headers")
+         ))
+   )
+
+
+(defn install-apache2-action
+  []
+  (actions/package "apache2"))
+
+
 (defplan install-apache2
   "Install apache2 package."
   [{:keys [instance-id]}]
   (let [settings (get-settings :httpd {:instance-id instance-id})]
-    (actions/package "apache2")))
+    (install-apache2-action)))
+
+(defn install-apachetop-action
+  []
+  (actions/package "apachetop"))
 
 (defplan install-apachetop
   "Install apachetop package."
   [{:keys [instance-id]}]
   (let [settings (get-settings :httpd {:instance-id instance-id})]
-    (actions/package "apachetop")))
+    (install-apachetop-action)))
 
 (defn deploy-site
   "Deploy simple static index.html site to apache2. TODO: update this
@@ -73,13 +121,6 @@
                                 :group "root"
                                 :mode "644"
                                 :content content)))
-
-(defn configure-and-enable-vhost
-  [vhost-name vhost-content]
-  (let [file-avail-name 
-        (str "/etc/apache2/sites-available/" vhost-name ".conf")]
-    (configure-file file-avail-name vhost-content)
-    (cmds/a2ensite vhost-name)))
 
 (def ^{:dynamic true} *default-settings*
   {})
