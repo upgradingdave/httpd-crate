@@ -109,6 +109,7 @@
 
 (defn install-letsencrypt-action
   []
+  (actions/package "git")
   (git/clone 
     "https://github.com/letsencrypt/letsencrypt"
     :checkout-dir "/usr/lib/letsencrypt")
@@ -118,7 +119,7 @@
   [fqdn & {:keys [adminmail]}]
   (actions/exec-script
       ("service apache2 stop")
-      (println "/usr/lib/letsencrypt/letsencrypt-auto certonly --standalone --agree-tos --force-renew"
+      ("/usr/lib/letsencrypt/letsencrypt-auto certonly --standalone --agree-tos --force-renew"
         "--email" ~(if (nil? adminmail) (str "admin@" fqdn) adminmail)
         "-d" ~fqdn)
       ("service apache2 start")
