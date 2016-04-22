@@ -2,6 +2,7 @@
   :description "Pallet crate to install and run Apache httpd"
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [com.palletops/pallet "0.8.11"]
+                 [com.palletops/git-crate "0.8.0-alpha.2" :exclusions [org.clojure/clojure]]
                  [ch.qos.logback/logback-classic "1.0.9"]
                  [com.palletops/pallet-vmfest "0.4.0-alpha.1"]]
   :repositories [["snapshots" :clojars]
