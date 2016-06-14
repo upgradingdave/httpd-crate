@@ -45,10 +45,13 @@
    "</Location>"])
 
 (defn workers-configuration
-  [& {:keys [worker host port]
-      :or {port "8009"
-           host "127.0.0.1"
-           worker "mod_jk_www"}}]
+  "Takes a mod-jk configuration and returns Content for configure-mod-jk-worker"
+  [config]
+  (let [worker (get config :worker)
+        host (get config :host)
+        app-port (get config :app-port)
+        socket-timeout (get config :socket-timeout)
+        socket-connect-timeout (get config :socket-connect-timeout)]
   ["# workers.tomcat_home should point to the location where you"                                                                                    
    "# installed tomcat. This is where you have your conf, webapps and lib"                                                                           
    "# directories."                                                                                                                                
@@ -68,16 +71,20 @@
    "#worker.loadbalancer.balance_workers=mod_jk_www"
    ""
    (str "worker.list=" worker)
-   (str "worker." worker ".port=" port)
+   ;Review: dda says: "worker.maintain=60" which is missing here
+   (str "worker." worker ".port=" app-port)
    (str "worker." worker ".host=" host)
    (str "worker." worker ".type=ajp13")
-   (str "worker." worker ".socket_timeout=900")
+   (str "worker." worker ".socket_connect_timeout=" socket-connect-timeout)
+   (str "worker." worker ".socket_timeout=" socket-timeout)
+   ;Review: keepalive shoud prob be true see: dda documentation about timeouts
    (str "worker." worker ".socket_keepalive=false")
    (str "worker." worker ".connection_pool_timeout=100")
-   ""])
+   ""]))
 
 (defn mod-jk-configuration
-  []
+  "Takes a mod-jk config and generates a Vector of Strings"
+  [config]
   ["# Licensed to the Apache Software Foundation (ASF) under one or more"
    "# contributor license agreements.  See the NOTICE file distributed with"
    "# this work for additional information regarding copyright ownership."
@@ -96,15 +103,15 @@
    "  JkShmFile /var/log/apache2/jk-runtime-status"
    "  "
    "  JkOptions +RejectUnsafeURI"
-   "  JkStripSession On"
-   "  JkWatchdogInterval 60"
+   (str "  JkStripSession " (get config :JkStripSession))
+   (str "  JkWatchdogInterval " (get config :JkWatchdogInterval))
    "  "
    "</IfModule>"])
 
 
 (defn configure-mod-jk-worker
-  [& {:keys [workers-configuration]
-      :or {workers-configuration (workers-configuration)}}]
+  "Takes a mod-jk configuration and creates a remote-file"
+  [config]
   (actions/remote-file
     "/etc/libapache2-mod-jk/workers.properties"
     :owner "root"
@@ -114,12 +121,11 @@
     :content 
     (string/join
       \newline
-      workers-configuration
-      ))
-  )
+      (workers-configuration config))))
 
 (defn install-mod-jk
-  []
+  "Takes a mod-jk configuration and installs mod-jk"
+  [config]
   (actions/package "libapache2-mod-jk")
   (actions/remote-file
     "/etc/apache2/mods-available/jk.conf"
@@ -130,7 +136,7 @@
     :content 
     (string/join
       \newline
-      (mod-jk-configuration)
+      (mod-jk-configuration config)
       ))  
   (cmds/a2enmod "jk")
   )

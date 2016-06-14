@@ -66,7 +66,7 @@
    [ & {:keys [limits 
                security 
                ports]
-        :or {limits (config/limits)
+        :or {limits (config/limits {:server-limit 150 :max-clients 150})
              security config/security
              ports config/ports}}]
    (configure-file-and-enable 
