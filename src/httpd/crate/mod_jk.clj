@@ -128,7 +128,9 @@
 
 (defn install-mod-jk
   "Installs mod-jk and creates a remote file consisting of the mod-jk-configuration"
-  []
+  [&{:keys [jkStripSession jkWatchdogInterval]
+     :or {jkStripSession "On"
+          jkWatchdogInterval 120}}]
   (actions/package "libapache2-mod-jk")
   (actions/remote-file
     "/etc/apache2/mods-available/jk.conf"
@@ -139,7 +141,7 @@
     :content 
     (string/join
       \newline
-      (mod-jk-configuration)
+      (mod-jk-configuration jkStripSession jkWatchdogInterval)
       ))  
   (cmds/a2enmod "jk")
   )
