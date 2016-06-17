@@ -10,10 +10,11 @@
 (ns httpd.crate.config)
 
 (defn limits
-  "Takes a limits configuration and returns a vector of strings"
-  [config]
-  [(str "ServerLimit " (get config :server-limit))
-   (str "MaxClients  " (get config :max-clients))])
+  "Takes optional args and returns a vector of strings"
+  [& {:keys [max-clients]
+      :or {max-clients "150"}}]
+  [(str "ServerLimit " max-clients)
+   (str "MaxClients  " max-clients)])
 
 (def ^:dynamic loadtest-logging
   ["# Format is: [remote host] [remote logname] [remote user] [request time] \"[first request line]\" [status]" 
