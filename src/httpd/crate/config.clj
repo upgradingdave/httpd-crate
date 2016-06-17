@@ -11,9 +11,10 @@
 
 (defn limits
   "Takes optional args and returns a vector of strings"
-  [& {:keys [max-clients]
-      :or {max-clients "150"}}]
-  [(str "ServerLimit " max-clients)
+  [& {:keys [max-clients server-limit]
+      :or {max-clients "150"
+           server-limit 150}}]
+  [(str "ServerLimit " server-limit)
    (str "MaxClients  " max-clients)])
 
 (def ^:dynamic loadtest-logging
