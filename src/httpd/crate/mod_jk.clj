@@ -45,7 +45,7 @@
    "</Location>"])
 
 (defn workers-configuration
-  "Takes optional args and returns content for configure-mod-jk-worker"
+  "Takes optional args and returns a workers-properties configuration"
    [& {:keys [worker host port socket-timeout socket-connect-timeout]
       :or {port "8009"
            host "127.0.0.1"
