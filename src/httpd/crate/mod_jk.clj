@@ -82,33 +82,39 @@
    (str "worker." worker ".connection_pool_timeout=100")
    ""])
 
+;Hier optional vhost-status-location
 (defn mod-jk-configuration
   "Takes optional args and generates a Vector of Strings"
-  [&{:keys [jkStripSession jkWatchdogInterval]
+  [&{:keys [jkStripSession jkWatchdogInterval vhost-jk-status-location?]
      :or {jkStripSession "On"
-          jkWatchdogInterval 120}}]
-  ["# Licensed to the Apache Software Foundation (ASF) under one or more"
-   "# contributor license agreements.  See the NOTICE file distributed with"
-   "# this work for additional information regarding copyright ownership."
-   "# The ASF licenses this file to You under the Apache License, Version 2.0"
-   "# (the \"License\"); you may not use this file except in compliance with"
-   "# the License.  You may obtain a copy of the License at"
-   "#"
-   "#     http://www.apache.org/licenses/LICENSE-2.0"
-   ""
-   "<IfModule jk_module>"
-   ""
-   "  JkWorkersFile /etc/libapache2-mod-jk/workers.properties"
-   "  "
-   "  JkLogFile /var/log/apache2/mod_jk.log"
-   "  JkLogLevel info"
-   "  JkShmFile /var/log/apache2/jk-runtime-status"
-   "  "
-   "  JkOptions +RejectUnsafeURI"
-   (str "  JkStripSession " jkStripSession)
-   (str "  JkWatchdogInterval " jkWatchdogInterval)
-   "  "
-   "</IfModule>"])
+          jkWatchdogInterval 120
+          vhost-jk-status-location? false}}]
+  (into []
+    (concat 
+      ["# Licensed to the Apache Software Foundation (ASF) under one or more"
+       "# contributor license agreements.  See the NOTICE file distributed with"
+       "# this work for additional information regarding copyright ownership."
+       "# The ASF licenses this file to You under the Apache License, Version 2.0"
+       "# (the \"License\"); you may not use this file except in compliance with"
+       "# the License.  You may obtain a copy of the License at"
+       "#"
+       "#     http://www.apache.org/licenses/LICENSE-2.0"
+       ""
+       "<IfModule jk_module>"
+       ""
+       ;"  JkWorkersFile /etc/libapache2-mod-jk/workers.properties"
+       "  "
+       "  JkLogFile /var/log/apache2/mod_jk.log"
+       "  JkLogLevel info"
+       "  JkShmFile /var/log/apache2/jk-runtime-status"
+       "  "
+       "  JkOptions +RejectUnsafeURI"
+       (str "  JkStripSession " jkStripSession)
+       (str "  JkWatchdogInterval " jkWatchdogInterval)]
+       (when vhost-jk-status-location?
+         (vhost-jk-status-location))
+       ["  "
+       "</IfModule>"])))
 
 
 (defn configure-mod-jk-worker
