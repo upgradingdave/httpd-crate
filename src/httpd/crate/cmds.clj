@@ -8,7 +8,9 @@
 ;
 ;; fn's to call apache2 commands on server
 
-(ns httpd.crate.cmds)
+(ns httpd.crate.cmds
+  (require 
+    [pallet.actions]))
 
 (defn apache2ctl
   "Start, stop, restart with apache2ctl command"
