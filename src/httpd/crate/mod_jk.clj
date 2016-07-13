@@ -45,13 +45,16 @@
    "</Location>"])
 
 (defn workers-configuration
-  "Takes optional args and returns a workers-properties configuration"
-   [& {:keys [worker host port socket-timeout socket-connect-timeout]
+  "Takes optional args and returns a workers-properties configuration. The key jk-worker-property is 
+   used to add JkWorkerProperty to the config file so it can be used in the Vhost-File."
+   [& {:keys [worker host port socket-timeout socket-connect-timeout jk-worker-property?]
       :or {port "8009"
            host "127.0.0.1"
            worker "mod_jk_www"
            socket-timeout 60000
-           socket-connect-timeout 300}}]
+           socket-connect-timeout 300
+           jk-worker-property? false}}]
+   (let [jkworkerproperty (when jk-worker-property? "JkWorkerProperty ")]
   ["# workers.tomcat_home should point to the location where you"                                                                                    
    "# installed tomcat. This is where you have your conf, webapps and lib"                                                                           
    "# directories."                                                                                                                                
@@ -70,17 +73,17 @@
    "#worker.loadbalancer.type=lb"
    "#worker.loadbalancer.balance_workers=mod_jk_www"
    ""
-   (str "worker.list=" worker)
+   (str jkworkerproperty "worker.list=" worker)
    ;Review: dda says: "worker.maintain=60" which is missing here
-   (str "worker." worker ".port=" port)
-   (str "worker." worker ".host=" host)
-   (str "worker." worker ".type=ajp13")
-   (str "worker." worker ".socket_connect_timeout=" socket-connect-timeout)
-   (str "worker." worker ".socket_timeout=" socket-timeout)
+   (str jkworkerproperty "worker." worker ".port=" port)
+   (str jkworkerproperty "worker." worker ".host=" host)
+   (str jkworkerproperty "worker." worker ".type=ajp13")
+   (str jkworkerproperty "worker." worker ".socket_connect_timeout=" socket-connect-timeout)
+   (str jkworkerproperty "worker." worker ".socket_timeout=" socket-timeout)
    ;Review: keepalive shoud prob be true see: dda documentation about timeouts
-   (str "worker." worker ".socket_keepalive=false")
-   (str "worker." worker ".connection_pool_timeout=100")
-   ""])
+   (str jkworkerproperty "worker." worker ".socket_keepalive=false")
+   (str jkworkerproperty "worker." worker ".connection_pool_timeout=100")
+   ""]))
 
 ;Hier optional vhost-status-location
 (defn mod-jk-configuration
