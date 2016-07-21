@@ -77,8 +77,6 @@
   (into []
     (concat 
       ["<IfModule jk_module>"
-       ""
-       ;"  JkWorkersFile /etc/libapache2-mod-jk/workers.properties"
        "  "
        "  JkLogFile /var/log/apache2/mod_jk.log"
        "  JkLogLevel info"
@@ -87,11 +85,11 @@
        "  JkOptions +RejectUnsafeURI"
        (str "  JkStripSession " jkStripSession)
        (str "  JkWatchdogInterval " jkWatchdogInterval)
-       ]
+       "  "]
        (when vhost-jk-status-location?
          (vhost-jk-status-location))
        ["  "
-       "</IfModule>"])))
+        "</IfModule>"])))
 
 
 (defn configure-mod-jk-worker
