@@ -47,41 +47,24 @@
 (defn workers-configuration
   "Takes optional args and returns a workers-properties configuration. The key jk-worker-property is 
    used to add JkWorkerProperty to the config file so it can be used in the Vhost-File."
-   [& {:keys [worker host port socket-timeout socket-connect-timeout jk-worker-property?]
+   [& {:keys [worker host port socket-timeout socket-connect-timeout maintain-timout-sec in-httpd-conf?]
       :or {port "8009"
            host "127.0.0.1"
            worker "mod_jk_www"
            socket-timeout 60000
            socket-connect-timeout 300
-           jk-worker-property? false}}]
-   (let [jkworkerproperty (when jk-worker-property? "JkWorkerProperty ")]
-  ["# workers.tomcat_home should point to the location where you"                                                                                    
-   "# installed tomcat. This is where you have your conf, webapps and lib"                                                                           
-   "# directories."                                                                                                                                
-   "#workers.tomcat_home=/usr/share/tomcat6"                                                                                                          
-   ""
-   "# workers.java_home should point to your Java installation. Normally"                                                                            
-   "# you should have a bin and lib directories beneath it."                                                                                         
-   "#workers.java_home=/usr/lib/jvm/default-java"                                                                                                     
-   ""                                                                                                                                                
-   "# You should configure your environment slash... ps=\\ on NT and / on UNIX"                                                                       
-   "# and maybe something different elsewhere."                                                                                                      
-   "#ps=/"                                                                                                                                            
-   ""
-   "# The loadbalancer (type lb) workers perform wighted round-robin"
-   "# load balancing with sticky sessions."
-   "#worker.loadbalancer.type=lb"
-   "#worker.loadbalancer.balance_workers=mod_jk_www"
-   ""
+           maintain-timout-sec 90
+           in-httpd-conf? false}}]
+   (let [jkworkerproperty (when in-httpd-conf? "JkWorkerProperty ")]
+  [;Review: dda says: "worker.* properties unfortunately should reside in a central file
    (str jkworkerproperty "worker.list=" worker)
-   ;Review: dda says: "worker.maintain=60" which is missing here
+   (str jkworkerproperty "worker.maintain=" maintain-timout-sec)
    (str jkworkerproperty "worker." worker ".port=" port)
    (str jkworkerproperty "worker." worker ".host=" host)
    (str jkworkerproperty "worker." worker ".type=ajp13")
    (str jkworkerproperty "worker." worker ".socket_connect_timeout=" socket-connect-timeout)
    (str jkworkerproperty "worker." worker ".socket_timeout=" socket-timeout)
-   ;Review: keepalive shoud prob be true see: dda documentation about timeouts
-   (str jkworkerproperty "worker." worker ".socket_keepalive=false")
+   (str jkworkerproperty "worker." worker ".socket_keepalive=true")
    (str jkworkerproperty "worker." worker ".connection_pool_timeout=100")
    ""]))
 
