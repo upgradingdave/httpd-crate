@@ -56,8 +56,7 @@
            maintain-timout-sec 90
            in-httpd-conf? false}}]
    (let [jkworkerproperty (when in-httpd-conf? "JkWorkerProperty ")]
-  [;Review: dda says: "worker.* properties unfortunately should reside in a central file
-   (str jkworkerproperty "worker.list=" worker)
+  [(str jkworkerproperty "worker.list=" worker)
    (str jkworkerproperty "worker.maintain=" maintain-timout-sec)
    (str jkworkerproperty "worker." worker ".port=" port)
    (str jkworkerproperty "worker." worker ".host=" host)
@@ -77,16 +76,7 @@
           vhost-jk-status-location? false}}]
   (into []
     (concat 
-      ["# Licensed to the Apache Software Foundation (ASF) under one or more"
-       "# contributor license agreements.  See the NOTICE file distributed with"
-       "# this work for additional information regarding copyright ownership."
-       "# The ASF licenses this file to You under the Apache License, Version 2.0"
-       "# (the \"License\"); you may not use this file except in compliance with"
-       "# the License.  You may obtain a copy of the License at"
-       "#"
-       "#     http://www.apache.org/licenses/LICENSE-2.0"
-       ""
-       "<IfModule jk_module>"
+      ["<IfModule jk_module>"
        ""
        ;"  JkWorkersFile /etc/libapache2-mod-jk/workers.properties"
        "  "
@@ -96,7 +86,8 @@
        "  "
        "  JkOptions +RejectUnsafeURI"
        (str "  JkStripSession " jkStripSession)
-       (str "  JkWatchdogInterval " jkWatchdogInterval)]
+       (str "  JkWatchdogInterval " jkWatchdogInterval)
+       ]
        (when vhost-jk-status-location?
          (vhost-jk-status-location))
        ["  "
