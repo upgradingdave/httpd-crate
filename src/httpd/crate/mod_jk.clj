@@ -45,8 +45,7 @@
    "</Location>"])
 
 (defn workers-configuration
-  "Takes optional args and returns a workers-properties configuration. The key jk-worker-property is 
-   used to add JkWorkerProperty to the config file so it can be used in the Vhost-File."
+  "Takes optional args and returns content for configure-mod-jk-worker"
    [& {:keys [worker host port socket-connect-timeout maintain-timout-sec in-httpd-conf?]
       :or {port "8009"
            host "127.0.0.1"
@@ -66,7 +65,7 @@
    (str jkworkerproperty "worker." worker ".connection_pool_timeout=100")
    ""]))
 
-;Hier optional vhost-status-location
+
 (defn mod-jk-configuration
   "Takes optional args and generates a Vector of Strings"
   [&{:keys [jkStripSession jkWatchdogInterval vhost-jk-status-location?]
