@@ -47,12 +47,11 @@
 (defn workers-configuration
   "Takes optional args and returns a workers-properties configuration. The key jk-worker-property is 
    used to add JkWorkerProperty to the config file so it can be used in the Vhost-File."
-   [& {:keys [worker host port socket-timeout socket-connect-timeout maintain-timout-sec in-httpd-conf?]
+   [& {:keys [worker host port socket-connect-timeout maintain-timout-sec in-httpd-conf?]
       :or {port "8009"
            host "127.0.0.1"
            worker "mod_jk_www"
-           socket-timeout 60000
-           socket-connect-timeout 300
+           socket-connect-timeout 60000
            maintain-timout-sec 90
            in-httpd-conf? false}}]
    (let [jkworkerproperty (when in-httpd-conf? "JkWorkerProperty ")]
@@ -62,7 +61,7 @@
    (str jkworkerproperty "worker." worker ".host=" host)
    (str jkworkerproperty "worker." worker ".type=ajp13")
    (str jkworkerproperty "worker." worker ".socket_connect_timeout=" socket-connect-timeout)
-   (str jkworkerproperty "worker." worker ".socket_timeout=" socket-timeout)
+   (str jkworkerproperty "worker." worker ".ping_mode=I")
    (str jkworkerproperty "worker." worker ".socket_keepalive=true")
    (str jkworkerproperty "worker." worker ".connection_pool_timeout=100")
    ""]))
