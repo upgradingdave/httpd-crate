@@ -13,6 +13,41 @@
     [httpd.crate.mod-jk :as sut]
     ))
 
+(deftest test-modjk-conf
+  (testing
+    "tests the modjk central config"
+    (is 
+      (= ["<IfModule jk_module>" 
+          "  "
+          "  JkWorkersFile /etc/libapache2-mod-jk/workers.properties"
+          "  "
+          "  JkLogFile /var/log/apache2/mod_jk.log" 
+          "  JkLogLevel info" 
+          "  JkShmFile /var/log/apache2/jk-runtime-status" 
+          "  " 
+          "  JkOptions +RejectUnsafeURI" 
+          "  JkStripSession On" 
+          "  JkWatchdogInterval 120" 
+          "  " 
+          "</IfModule>"]
+         (sut/mod-jk-configuration)))
+    (is 
+      (= ["<IfModule jk_module>" 
+          "  "
+          "  JkLogFile /var/log/apache2/mod_jk.log" 
+          "  JkLogLevel info" 
+          "  JkShmFile /var/log/apache2/jk-runtime-status" 
+          "  " 
+          "  JkOptions +RejectUnsafeURI" 
+          "  JkStripSession On" 
+          "  JkWatchdogInterval 120" 
+          "  " 
+          "</IfModule>"]
+         (sut/mod-jk-configuration
+           :workers-properties-file nil)))
+    
+    ))
+
 (deftest test-vhost
   (testing
     "tests the vhost config"
@@ -20,13 +55,10 @@
       (= ["JkMount /* mod_jk_www"]
          (sut/vhost-jk-mount
            :path "/*"
-           :worker "mod_jk_www")
-         ))
+           :worker "mod_jk_www")))
     (is 
       (= ["JkUnMount /error/* mod_jk_www"]
          (sut/vhost-jk-unmount
            :path "/error/*"
-           :worker "mod_jk_www")
-         ))
-    )
-  )
+           :worker "mod_jk_www")))
+    ))

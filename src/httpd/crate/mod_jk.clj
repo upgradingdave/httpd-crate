@@ -68,15 +68,19 @@
 
 (defn mod-jk-configuration
   "Takes optional args and generates a Vector of Strings"
-  [&{:keys [jkStripSession jkWatchdogInterval vhost-jk-status-location?]
+  [&{:keys [jkStripSession jkWatchdogInterval vhost-jk-status-location? workers-properties-file]
      :or {jkStripSession "On"
           jkWatchdogInterval 120
-          vhost-jk-status-location? false}}]
+          vhost-jk-status-location? false
+          workers-properties-file "/etc/libapache2-mod-jk/workers.properties"}}]
   (into []
     (concat 
       ["<IfModule jk_module>"
-       "  "
-       "  JkLogFile /var/log/apache2/mod_jk.log"
+       "  "]
+       (when (some? workers-properties-file)
+         [(str "  JkWorkersFile " workers-properties-file)
+          "  "])
+       ["  JkLogFile /var/log/apache2/mod_jk.log"
        "  JkLogLevel info"
        "  JkShmFile /var/log/apache2/jk-runtime-status"
        "  "
@@ -84,10 +88,10 @@
        (str "  JkStripSession " jkStripSession)
        (str "  JkWatchdogInterval " jkWatchdogInterval)
        "  "]
-       (when vhost-jk-status-location?
-         (vhost-jk-status-location))
-       ["  "
-        "</IfModule>"])))
+      (when vhost-jk-status-location?
+        [(vhost-jk-status-location)
+         "  "])
+       ["</IfModule>"])))
 
 
 (defn configure-mod-jk-worker
