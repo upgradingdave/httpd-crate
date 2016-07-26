@@ -42,7 +42,8 @@
    "  Order deny,allow"
    "  Deny from all"
    "  Allow from 127.0.0.1"
-   "</Location>"])
+   "</Location>"
+   ""])
 
 (defn workers-configuration
   "Takes optional args and returns content for configure-mod-jk-worker"
@@ -96,8 +97,7 @@
        (str "  JkWatchdogInterval " jkWatchdogInterval)
        "  "]
       (when vhost-jk-status-location?
-        [(vhost-jk-status-location)
-         "  "])
+        (vhost-jk-status-location))
        ["</IfModule>"])))
 
 
