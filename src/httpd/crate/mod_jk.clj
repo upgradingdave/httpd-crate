@@ -46,24 +46,31 @@
 
 (defn workers-configuration
   "Takes optional args and returns content for configure-mod-jk-worker"
-   [& {:keys [worker host port socket-connect-timeout maintain-timout-sec in-httpd-conf?]
+   [& {:keys [worker host port socket-connect-timeout-ms maintain-timout-sec in-httpd-conf ping-mode socket-keep-alive]
       :or {port "8009"
            host "127.0.0.1"
            worker "mod_jk_www"
-           socket-connect-timeout 60000
+           socket-connect-timeout-ms 900000
            maintain-timout-sec 90
-           in-httpd-conf? false}}]
-   (let [jkworkerproperty (when in-httpd-conf? "JkWorkerProperty ")]
-  [(str jkworkerproperty "worker.list=" worker)
-   (str jkworkerproperty "worker.maintain=" maintain-timout-sec)
-   (str jkworkerproperty "worker." worker ".port=" port)
-   (str jkworkerproperty "worker." worker ".host=" host)
-   (str jkworkerproperty "worker." worker ".type=ajp13")
-   (str jkworkerproperty "worker." worker ".socket_connect_timeout=" socket-connect-timeout)
-   (str jkworkerproperty "worker." worker ".ping_mode=I")
-   (str jkworkerproperty "worker." worker ".socket_keepalive=true")
-   (str jkworkerproperty "worker." worker ".connection_pool_timeout=100")
-   ""]))
+           in-httpd-conf false
+           ping-mode nil
+           socket-keep-alive false}}]
+   (let [jkworkerproperty (when in-httpd-conf "JkWorkerProperty ")]
+     (into 
+       []
+       (concat
+         [(str jkworkerproperty "worker.list=" worker)
+          (str jkworkerproperty "worker.maintain=" maintain-timout-sec)
+          (str jkworkerproperty "worker." worker ".port=" port)
+          (str jkworkerproperty "worker." worker ".host=" host)
+          (str jkworkerproperty "worker." worker ".type=ajp13")
+          (str jkworkerproperty "worker." worker ".socket_connect_timeout=" socket-connect-timeout-ms)]
+         (when (some? ping-mode)
+           [(str jkworkerproperty "worker." worker ".ping_mode=" ping-mode)])
+         [(str jkworkerproperty "worker." worker ".socket_keepalive="socket-keep-alive)
+          (str jkworkerproperty "worker." worker ".connection_pool_timeout=100")
+          ""]))
+     ))
 
 
 (defn mod-jk-configuration

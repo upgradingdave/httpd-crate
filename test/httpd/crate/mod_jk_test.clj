@@ -13,6 +13,38 @@
     [httpd.crate.mod-jk :as sut]
     ))
 
+(deftest test-workers-configuration
+  (testing
+    "tests the modjk central config"
+    (is 
+      (= ["worker.list=mod_jk_www" 
+          "worker.maintain=90" 
+          "worker.mod_jk_www.port=8009" 
+          "worker.mod_jk_www.host=127.0.0.1" 
+          "worker.mod_jk_www.type=ajp13" 
+          "worker.mod_jk_www.socket_connect_timeout=900000" 
+          "worker.mod_jk_www.socket_keepalive=false" 
+          "worker.mod_jk_www.connection_pool_timeout=100" 
+          ""]
+         (sut/workers-configuration)))
+    (is 
+      (= ["JkWorkerProperty worker.list=mod_jk_www" 
+          "JkWorkerProperty worker.maintain=90" 
+          "JkWorkerProperty worker.mod_jk_www.port=8009" 
+          "JkWorkerProperty worker.mod_jk_www.host=127.0.0.1" 
+          "JkWorkerProperty worker.mod_jk_www.type=ajp13" 
+          "JkWorkerProperty worker.mod_jk_www.socket_connect_timeout=900000"
+          "JkWorkerProperty worker.mod_jk_www.ping_mode=I"
+          "JkWorkerProperty worker.mod_jk_www.socket_keepalive=true" 
+          "JkWorkerProperty worker.mod_jk_www.connection_pool_timeout=100" 
+          ""]
+         (sut/workers-configuration
+           :in-httpd-conf true
+           :socket-keep-alive true
+           :ping-mode "I")))
+    
+    ))
+
 (deftest test-modjk-conf
   (testing
     "tests the modjk central config"
