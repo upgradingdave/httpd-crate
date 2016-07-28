@@ -17,9 +17,11 @@
                           defplan
                           get-settings]]
     [pallet.stevedore :as stevedore]
+    [pallet.crate.git :as git]
     [httpd.crate.vhost :as vhost]
     [httpd.crate.cmds :as cmds]
     [httpd.crate.config :as config]
+    [clojure.tools.logging :as logging]
 ))
 
 ;; Apache2 related pallet actions
@@ -104,6 +106,25 @@
   [{:keys [instance-id]}]
   (let [settings (get-settings :httpd {:instance-id instance-id})]
     (install-apachetop-action)))
+
+(defn install-letsencrypt-action
+  []
+  (actions/package "git")
+  (git/clone 
+    "https://github.com/letsencrypt/letsencrypt"
+    :checkout-dir "/usr/lib/letsencrypt")
+  )
+ 
+(defn install-letsencrypt-certs 
+  [fqdn & {:keys [adminmail]}]
+  (actions/exec-script
+      ("service apache2 stop")
+      ("/usr/lib/letsencrypt/letsencrypt-auto certonly --standalone --agree-tos --force-renew"
+        "--email" ~(if (nil? adminmail) (str "admin@" fqdn) adminmail)
+        "-d" ~fqdn)
+      ("service apache2 start")
+    )
+  )
 
 (defn deploy-site
   "Deploy simple static index.html site to apache2. TODO: update this

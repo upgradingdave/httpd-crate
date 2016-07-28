@@ -23,6 +23,16 @@
   (str "/etc/apache2/ssl.key/" domain-name ".key")
   )
 
+(defn- certs-file-name-letsencrypt
+  [domain-name]
+  (str "/etc/letsencrypt/live/" domain-name "/fullchain.pem")
+  )
+
+(defn- key-file-name-letsencrypt
+  [domain-name]
+  (str "/etc/letsencrypt/live/" domain-name "/privkey.pem")
+  )
+
 (def gnutls-conf
   ["<IfModule mod_gnutls.c>"
    "  # managed by pallet - do not change manually"
@@ -87,6 +97,18 @@
    ""
    (str "GnuTLSCertificateFile " (certs-file-name domain-name))
    (str "GnuTLSKeyFile " (key-file-name domain-name))
+   ""]
+  )
+
+(defn vhost-gnutls-letsencrypt
+  [domain-name]
+  ["GnuTLSEnable on"
+   "GnuTLSCacheTimeout 300"
+   "GnuTLSPriorities SECURE:!VERS-SSL3.0:!MD5:!DHE-RSA:!DHE-DSS:!AES-256-CBC:%COMPAT"
+   "GnuTLSExportCertificates on"
+   ""
+   (str "GnuTLSCertificateFile " (certs-file-name-letsencrypt domain-name))
+   (str "GnuTLSKeyFile " (key-file-name-letsencrypt domain-name))
    ""]
   )
 

@@ -45,64 +45,64 @@
    "</Location>"])
 
 (defn workers-configuration
-  [& {:keys [worker host port]
+  "Takes optional args and returns content for configure-mod-jk-worker"
+   [& {:keys [worker host port socket-connect-timeout-ms maintain-timout-sec in-httpd-conf ping-mode socket-keep-alive]
       :or {port "8009"
            host "127.0.0.1"
-           worker "mod_jk_www"}}]
-  ["# workers.tomcat_home should point to the location where you"                                                                                    
-   "# installed tomcat. This is where you have your conf, webapps and lib"                                                                           
-   "# directories."                                                                                                                                
-   "#workers.tomcat_home=/usr/share/tomcat6"                                                                                                          
-   ""
-   "# workers.java_home should point to your Java installation. Normally"                                                                            
-   "# you should have a bin and lib directories beneath it."                                                                                         
-   "#workers.java_home=/usr/lib/jvm/default-java"                                                                                                     
-   ""                                                                                                                                                
-   "# You should configure your environment slash... ps=\\ on NT and / on UNIX"                                                                       
-   "# and maybe something different elsewhere."                                                                                                      
-   "#ps=/"                                                                                                                                            
-   ""
-   "# The loadbalancer (type lb) workers perform wighted round-robin"
-   "# load balancing with sticky sessions."
-   "#worker.loadbalancer.type=lb"
-   "#worker.loadbalancer.balance_workers=mod_jk_www"
-   ""
-   (str "worker.list=" worker)
-   (str "worker." worker ".port=" port)
-   (str "worker." worker ".host=" host)
-   (str "worker." worker ".type=ajp13")
-   (str "worker." worker ".socket_timeout=900")
-   (str "worker." worker ".socket_keepalive=false")
-   (str "worker." worker ".connection_pool_timeout=100")
-   ""])
+           worker "mod_jk_www"
+           socket-connect-timeout-ms 900000
+           maintain-timout-sec 90
+           in-httpd-conf false
+           ping-mode nil
+           socket-keep-alive false}}]
+   (let [jkworkerproperty (when in-httpd-conf "JkWorkerProperty ")]
+     (into 
+       []
+       (concat
+         [(str jkworkerproperty "worker.list=" worker)
+          (str jkworkerproperty "worker.maintain=" maintain-timout-sec)
+          (str jkworkerproperty "worker." worker ".port=" port)
+          (str jkworkerproperty "worker." worker ".host=" host)
+          (str jkworkerproperty "worker." worker ".type=ajp13")
+          (str jkworkerproperty "worker." worker ".socket_connect_timeout=" socket-connect-timeout-ms)]
+         (when (some? ping-mode)
+           [(str jkworkerproperty "worker." worker ".ping_mode=" ping-mode)])
+         [(str jkworkerproperty "worker." worker ".socket_keepalive="socket-keep-alive)
+          (str jkworkerproperty "worker." worker ".connection_pool_timeout=100")
+          ""]))
+     ))
+
 
 (defn mod-jk-configuration
-  []
-  ["# Licensed to the Apache Software Foundation (ASF) under one or more"
-   "# contributor license agreements.  See the NOTICE file distributed with"
-   "# this work for additional information regarding copyright ownership."
-   "# The ASF licenses this file to You under the Apache License, Version 2.0"
-   "# (the \"License\"); you may not use this file except in compliance with"
-   "# the License.  You may obtain a copy of the License at"
-   "#"
-   "#     http://www.apache.org/licenses/LICENSE-2.0"
-   ""
-   "<IfModule jk_module>"
-   ""
-   "  JkWorkersFile /etc/libapache2-mod-jk/workers.properties"
-   "  "
-   "  JkLogFile /var/log/apache2/mod_jk.log"
-   "  JkLogLevel info"
-   "  JkShmFile /var/log/apache2/jk-runtime-status"
-   "  "
-   "  JkOptions +RejectUnsafeURI"
-   "  JkStripSession On"
-   "  JkWatchdogInterval 60"
-   "  "
-   "</IfModule>"])
+  "Takes optional args and generates a Vector of Strings"
+  [&{:keys [jkStripSession jkWatchdogInterval vhost-jk-status-location? workers-properties-file]
+     :or {jkStripSession "On"
+          jkWatchdogInterval 120
+          vhost-jk-status-location? false
+          workers-properties-file "/etc/libapache2-mod-jk/workers.properties"}}]
+  (into []
+    (concat 
+      ["<IfModule jk_module>"
+       "  "]
+       (when (some? workers-properties-file)
+         [(str "  JkWorkersFile " workers-properties-file)
+          "  "])
+       ["  JkLogFile /var/log/apache2/mod_jk.log"
+       "  JkLogLevel info"
+       "  JkShmFile /var/log/apache2/jk-runtime-status"
+       "  "
+       "  JkOptions +RejectUnsafeURI"
+       (str "  JkStripSession " jkStripSession)
+       (str "  JkWatchdogInterval " jkWatchdogInterval)
+       "  "]
+      (when vhost-jk-status-location?
+        [(vhost-jk-status-location)
+         "  "])
+       ["</IfModule>"])))
 
 
 (defn configure-mod-jk-worker
+  "Takes optional args and creates a remote-file"
   [& {:keys [workers-configuration]
       :or {workers-configuration (workers-configuration)}}]
   (actions/remote-file
@@ -114,12 +114,13 @@
     :content 
     (string/join
       \newline
-      workers-configuration
-      ))
-  )
+      workers-configuration)))
 
 (defn install-mod-jk
-  []
+  "Installs mod-jk and creates a remote file consisting of the mod-jk-configuration"
+  [&{:keys [jkStripSession jkWatchdogInterval]
+     :or {jkStripSession "On"
+          jkWatchdogInterval 120}}]
   (actions/package "libapache2-mod-jk")
   (actions/remote-file
     "/etc/apache2/mods-available/jk.conf"
@@ -130,7 +131,7 @@
     :content 
     (string/join
       \newline
-      (mod-jk-configuration)
+      (mod-jk-configuration jkStripSession jkWatchdogInterval)
       ))  
   (cmds/a2enmod "jk")
   )
