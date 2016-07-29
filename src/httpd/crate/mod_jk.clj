@@ -29,9 +29,9 @@
 
 (defn vhost-jk-status-location
   []
-  ["<Location /jk-status>"
-   "   # Inside Location we can omit the URL in JkMount"
-   "   JkMount jk-status"
+  ["  <Location /jk-status>"
+   "    # Inside Location we can omit the URL in JkMount"
+   "    JkMount jk-status"
    "   Order deny,allow"
    "   Deny from all"
    "   Allow from 127.0.0.1"
