@@ -94,3 +94,41 @@
            :path "/error/*"
            :worker "mod_jk_www")))
     ))
+
+(def etc-libapache2-mod-jk-httpd-jk-conf
+ ["<IfModule jk_module>"
+ "  "
+ "  JkLogFile /var/log/apache2/mod_jk.log"
+ "  JkLogLevel info"
+ "  JkShmFile /var/log/apache2/jk-runtime-status"
+ "  "
+ "  JkOptions +RejectUnsafeURI"
+ "  JkStripSession On"
+ "  JkWatchdogInterval 120"
+ "  "
+ "  <Location /jk-status>"
+ "    # Inside Location we can omit the URL in JkMount"
+ "    JkMount jk-status"
+ "   Order deny,allow"
+ "   Deny from all"
+ "   Allow from 127.0.0.1"
+ "</Location>"
+ "<Location /jk-manager>"
+ "  # Inside Location we can omit the URL in JkMount"
+ "  JkMount jk-manager"
+ "  Order deny,allow"
+ "  Deny from all"
+ "  Allow from 127.0.0.1"
+ "</Location>"
+ ""
+ "</IfModule>"])
+
+(deftest test-modjk
+  (testing 
+    "Test the creation of an example modjk from configuration." 
+    (is (= etc-libapache2-mod-jk-httpd-jk-conf 
+           (sut/mod-jk-configuration 
+             :jkWatchdogInterval 120
+             :jkStripSession "On"
+             :vhost-jk-status-location? true
+             :workers-properties-file nil)))))

@@ -29,12 +29,12 @@
 
 (defn vhost-jk-status-location
   []
-  ["<Location /jk-status>"
-   "  # Inside Location we can omit the URL in JkMount"
-   "  JkMount jk-status"
-   "  Order deny,allow"
-   "  Deny from all"
-   "  Allow from 127.0.0.1"
+  ["  <Location /jk-status>"
+   "    # Inside Location we can omit the URL in JkMount"
+   "    JkMount jk-status"
+   "   Order deny,allow"
+   "   Deny from all"
+   "   Allow from 127.0.0.1"
    "</Location>"
    "<Location /jk-manager>"
    "  # Inside Location we can omit the URL in JkMount"
@@ -42,7 +42,8 @@
    "  Order deny,allow"
    "  Deny from all"
    "  Allow from 127.0.0.1"
-   "</Location>"])
+   "</Location>"
+   ""])
 
 (defn workers-configuration
   "Takes optional args and returns content for configure-mod-jk-worker"
@@ -88,16 +89,15 @@
          [(str "  JkWorkersFile " workers-properties-file)
           "  "])
        ["  JkLogFile /var/log/apache2/mod_jk.log"
-       "  JkLogLevel info"
-       "  JkShmFile /var/log/apache2/jk-runtime-status"
-       "  "
-       "  JkOptions +RejectUnsafeURI"
+        "  JkLogLevel info"
+        "  JkShmFile /var/log/apache2/jk-runtime-status"
+        "  "
+        "  JkOptions +RejectUnsafeURI"
        (str "  JkStripSession " jkStripSession)
        (str "  JkWatchdogInterval " jkWatchdogInterval)
        "  "]
       (when vhost-jk-status-location?
-        [(vhost-jk-status-location)
-         "  "])
+        (vhost-jk-status-location))
        ["</IfModule>"])))
 
 
